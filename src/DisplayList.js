@@ -116,7 +116,10 @@ DisplayList.prototype._addRecursive = function (container, parent) {
  */
 DisplayList.prototype.update = function (parentContainer) {
     this.clear();
-    parentContainer.displayGroup = this.defaultDisplayGroup;
+    var tempGroup = parentContainer.displayGroup;
+    this.displayGroups.push(this.defaultDisplayGroup);
+    this.defaultDisplayGroup.add(parentContainer);
+
     this.container = parentContainer;
     var children = parentContainer.children;
     var i;
