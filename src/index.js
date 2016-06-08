@@ -16,13 +16,16 @@
 
 var plugin = {
     DisplayGroup: require('./DisplayGroup'),
+    DisplayList: require('./DisplayList'),
     Const: require('./Const'),
     DisplayObjectMixin: require('./DisplayObjectMixin'),
-    ContainerMixin: require('./ContainerMixin')
+    ContainerMixin: require('./ContainerMixin'),
+    SystemRendererMixin: require('./SystemRendererMixin')
 };
 
 var pluginMixin = {
-    DisplayGroup: plugin.DisplayGroup
+    DisplayGroup: plugin.DisplayGroup,
+    DisplayList: plugin.DisplayList
 };
 
 Object.assign(pluginMixin, plugin.Const);
@@ -30,6 +33,8 @@ Object.assign(pluginMixin, plugin.Const);
 Object.assign(PIXI.DisplayObject.prototype, plugin.DisplayObjectMixin);
 
 Object.assign(PIXI.Container.prototype, plugin.ContainerMixin);
+
+Object.assign(PIXI.SystemRenderer.prototype, plugin.SystemRendererMixin);
 
 Object.assign(PIXI, pluginMixin);
 
