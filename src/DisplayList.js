@@ -1,5 +1,4 @@
 var EventEmitter = PIXI.utils.EventEmitter,
-    utils = require('./utils'),
     Const = require('./Const'),
     DisplayGroup = require('./DisplayGroup');
 /**
@@ -17,10 +16,14 @@ function DisplayList() {
      */
     this.displayGroups = [];
 
-    this.defaultDisplayGroup = new DisplayGroup(0);
+    this.container = null;
+
+    this.defaultDisplayGroup = new DisplayGroup(0, false);
 }
 
 DisplayList.prototype = Object.create(EventEmitter.prototype);
+DisplayList.prototype.constructor = DisplayList;
+module.exports = DisplayList;
 
 /**
  * clears all display lists that were used in last rendering session
@@ -32,6 +35,7 @@ DisplayList.prototype.clear = function () {
         list[i].clear();
     }
     list.length = 0;
+    this.container = null;
 };
 
 /**
@@ -103,11 +107,19 @@ DisplayList.prototype._addRecursive = function (container, parent) {
 DisplayList.prototype.update = function (parentContainer) {
     this.clear();
     parentContainer.displayGroup = this.defaultDisplayGroup;
+    this.container = parentContainer;
     var children = parentContainer.children;
-    for (var i = 0; i < children.length; i++) {
+    var i;
+    for (i = 0; i < children.length; i++) {
         this._addRecursive(children[i], parentContainer);
     }
-    this.displayGroups.sort(DisplayList.compareZIndex);
+    var groups = this.displayGroups;
+    groups.sort(DisplayList.compareZIndex);
+    for (i = 0; i < groups.length; i++) {
+        groups[i].currentIndex = i;
+        groups[i].update();
+    }
+    this.emit('afterUpdate');
 };
 
 /**
@@ -125,9 +137,9 @@ DisplayList.prototype.renderWebGL = function (parentContainer, renderer) {
             if (container.displayFlag) {
                 container.renderWebGL(renderer);
             } else {
-                container.displayOrder = utils.incDisplayOrder();
+                container.displayOrder = renderer.incDisplayOrder();
                 container._renderWebGL(renderer);
-                var children = child.displayChildren;
+                var children = container.displayChildren;
                 if (children && children.length) {
                     for (var k = 0; k < children.length; k++) {
                         var child = children[k];
@@ -158,9 +170,9 @@ DisplayList.prototype.renderCanvas = function (parentContainer, renderer) {
             if (container.displayFlag) {
                 container.renderCanvas(renderer);
             } else {
-                container.displayOrder = utils.incDisplayOrder();
+                container.displayOrder = renderer.incDisplayOrder();
                 container._renderCanvas(renderer);
-                var children = child.displayChildren;
+                var children = container.displayChildren;
                 if (children && children.length) {
                     for (var k = 0; k < children.length; k++) {
                         var child = children[k];

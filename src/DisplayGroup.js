@@ -6,9 +6,10 @@ var EventEmitter = PIXI.utils.EventEmitter;
  * @extends EventEmitter
  * @memberof PIXI
  * @param zIndex {number} z-index for display group
+ * @param sorting {boolean | Function} if you need to sort elements inside, please provide function that will set displayObject.zOrder accordingly
  */
 
-function DisplayGroup(zIndex) {
+function DisplayGroup(zIndex, sorting) {
     EventEmitter.call(this);
     /**
      * Children that were rendered in last run
@@ -34,16 +35,22 @@ function DisplayGroup(zIndex) {
      * sort elements inside or not
      * @type {boolean}
      */
-    this.enableSort = false;
+    this.enableSort = !!sorting;
+
+    if (typeof sorting === 'function') {
+        this.on('add', sorting);
+    }
 }
 
 DisplayGroup.prototype = Object.create(EventEmitter.prototype);
+DisplayGroup.prototype.constructor = DisplayGroup;
+module.exports = DisplayGroup;
 
 DisplayGroup.compareZOrder = function (a, b) {
-    if (a.zOrder > b.zOrder) {
+    if (a.zOrder < b.zOrder) {
         return 1;
     }
-    if (a.zOrder < b.zOrder) {
+    if (a.zOrder > b.zOrder) {
         return -1;
     }
     return a.displayOrder - b.displayOrder;

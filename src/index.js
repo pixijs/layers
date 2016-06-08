@@ -20,7 +20,9 @@ var plugin = {
     Const: require('./Const'),
     DisplayObjectMixin: require('./DisplayObjectMixin'),
     ContainerMixin: require('./ContainerMixin'),
-    SystemRendererMixin: require('./SystemRendererMixin')
+    SystemRendererMixin: require('./SystemRendererMixin'),
+    WebGLRendererMixin: require('./WebGLRendererMixin'),
+    CanvasRendererMixin: require('./CanvasRendererMixin')
 };
 
 var pluginMixin = {
@@ -34,7 +36,9 @@ Object.assign(PIXI.DisplayObject.prototype, plugin.DisplayObjectMixin);
 
 Object.assign(PIXI.Container.prototype, plugin.ContainerMixin);
 
-Object.assign(PIXI.SystemRenderer.prototype, plugin.SystemRendererMixin);
+Object.assign(PIXI.WebGLRenderer.prototype, plugin.SystemRendererMixin, plugin.WebGLRendererMixin);
+
+Object.assign(PIXI.CanvasRenderer.prototype, plugin.SystemRendererMixin, plugin.CanvasRendererMixin);
 
 Object.assign(PIXI, pluginMixin);
 
