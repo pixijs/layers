@@ -18,6 +18,13 @@ function DisplayList() {
 
     this.container = null;
 
+    /**
+     * how many elements were rendered by display list last time
+     * also it is used to generate updateOrder for them
+     * @type {number}
+     */
+    this.totalElements = 0;
+
     this.defaultDisplayGroup = new DisplayGroup(0, false);
 }
 
@@ -35,6 +42,7 @@ DisplayList.prototype.clear = function () {
         list[i].clear();
     }
     list.length = 0;
+    this.totalElements = 0;
     this.container = null;
 };
 
@@ -55,7 +63,7 @@ DisplayList.compareZIndex = function (a, b) {
 
 /**
  *
- * @param container {PIXI.DisplayObject} container that we are adding to displaylist
+ * @param displayObject {PIXI.DisplayObject} container that we are adding to displaylist
  * @param parent {PIXI.Container} it is not direct parent, but some of ancestors
  * @private
  */
@@ -65,6 +73,8 @@ DisplayList.prototype._addRecursive = function (container, parent) {
     }
     var groups = this.displayGroups;
     var group = parent.displayGroup;
+
+    container.updateOrder = this.totalElements++;
     if (container.displayGroup) {
         group = container.displayGroup;
         if (!group.currentDisplayList) {
@@ -84,18 +94,18 @@ DisplayList.prototype._addRecursive = function (container, parent) {
     }
 
     if (container.displayFlag !== Const.DISPLAY_FLAG.MANUAL_CONTAINER) {
-        if (container._mask || container._filters && container._filters.length || container.displayList) {
-            container.displayFlag = Const.DISPLAY_FLAG.AUTO_CONTAINER;
-        } else {
-            var children = container.children;
-            if (children && children.length > 0) {
+        var children = container.children;
+        if (children && children.length > 0) {
+            if (container._mask || container._filters && container._filters.length || container.displayList) {
+                container.displayFlag = Const.DISPLAY_FLAG.AUTO_CONTAINER;
+            } else {
                 container.displayFlag = Const.DISPLAY_FLAG.AUTO_CHILDREN;
                 for (var i = 0; i < children.length; i++) {
                     this._addRecursive(children[i], container.displayParent);
                 }
-            } else {
-                container.displayFlag = Const.DISPLAY_FLAG.AUTO_OBJECT;
             }
+        } else {
+            container.displayFlag = Const.DISPLAY_FLAG.AUTO_OBJECT;
         }
     }
 };
@@ -143,6 +153,7 @@ DisplayList.prototype.renderWebGL = function (parentContainer, renderer) {
                 if (children && children.length) {
                     for (var k = 0; k < children.length; k++) {
                         var child = children[k];
+                        child.displayOrder = renderer.incDisplayOrder();
                         if (child.displayFlag) {
                             child.renderWebGL(renderer);
                         } else {

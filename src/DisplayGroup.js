@@ -29,7 +29,11 @@ function DisplayGroup(zIndex, sorting) {
      */
     this.currentIndex = 0;
 
-    this.zIndex = this.zIndex || 0;
+    /**
+     * Groups with lesser zIndex will be rendered first. Inside one group objects with largest zOrder will be rendered first.
+     * @type {number}
+     */
+    this.zIndex = zIndex || 0;
 
     /**
      * sort elements inside or not
@@ -46,6 +50,12 @@ DisplayGroup.prototype = Object.create(EventEmitter.prototype);
 DisplayGroup.prototype.constructor = DisplayGroup;
 module.exports = DisplayGroup;
 
+/**
+ * 
+ * @param a
+ * @param b
+ * @returns {number}
+ */
 DisplayGroup.compareZOrder = function (a, b) {
     if (a.zOrder < b.zOrder) {
         return 1;
@@ -53,7 +63,7 @@ DisplayGroup.compareZOrder = function (a, b) {
     if (a.zOrder > b.zOrder) {
         return -1;
     }
-    return a.displayOrder - b.displayOrder;
+    return a.updateOrder - b.updateOrder;
 };
 
 /**
@@ -78,12 +88,12 @@ DisplayGroup.prototype.clear = function () {
 
 /**
  * used only by displayList before sorting takes place
- * @param container {PIXI.Container}
+ * @param container {PIXI.DisplayObject}
  */
-DisplayGroup.prototype.add = function (container) {
-    container.displayOrder = this.computedChildren.length;
-    this.emit('add', container);
-    this.computedChildren.push(container);
+DisplayGroup.prototype.add = function (displayObject) {
+    displayObject.displayOrder = this.computedChildren.length;
+    this.emit('add', displayObject);
+    this.computedChildren.push(displayObject);
 };
 
 /**
