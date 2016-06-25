@@ -84,7 +84,7 @@ DisplayList.prototype._addRecursive = function (container, parent) {
         }
         group.add(container);
 
-        container.displayParent = this;
+        container.displayParent = container;
     } else {
         container.displayParent = parent;
         if (!parent.displayChildren) {
