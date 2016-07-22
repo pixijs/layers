@@ -144,28 +144,7 @@ DisplayList.prototype.renderWebGL = function (parentContainer, renderer) {
     var groups = this.displayGroups;
     for (var i = 0; i < groups.length; i++) {
         var group = groups[i];
-        var list = group.computedChildren;
-        for (var j = 0; j < list.length; j++) {
-            var container = list[j];
-            if (container.displayFlag) {
-                container.renderWebGL(renderer);
-            } else {
-                container.displayOrder = renderer.incDisplayOrder();
-                container._renderWebGL(renderer);
-                var children = container.displayChildren;
-                if (children && children.length) {
-                    for (var k = 0; k < children.length; k++) {
-                        var child = children[k];
-                        child.displayOrder = renderer.incDisplayOrder();
-                        if (child.displayFlag) {
-                            child.renderWebGL(renderer);
-                        } else {
-                            child._renderWebGL(renderer);
-                        }
-                    }
-                }
-            }
-        }
+        group.renderWebGL(parentContainer, renderer);
     }
 };
 
@@ -178,27 +157,6 @@ DisplayList.prototype.renderCanvas = function (parentContainer, renderer) {
     var groups = this.displayGroups;
     for (var i = 0; i < groups.length; i++) {
         var group = groups[i];
-        var list = group.computedChildren;
-        for (var j = 0; j < list.length; j++) {
-            var container = list[j];
-            if (container.displayFlag) {
-                container.renderCanvas(renderer);
-            } else {
-                container.displayOrder = renderer.incDisplayOrder();
-                container._renderCanvas(renderer);
-                var children = container.displayChildren;
-                if (children && children.length) {
-                    for (var k = 0; k < children.length; k++) {
-                        var child = children[k];
-                        child.displayOrder = renderer.incDisplayOrder();
-                        if (child.displayFlag) {
-                            child.renderCanvas(renderer);
-                        } else {
-                            child._renderCanvas(renderer);
-                        }
-                    }
-                }
-            }
-        }
+        group.renderCanvas(parentContainer, renderer);
     }
 };
