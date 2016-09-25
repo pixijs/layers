@@ -15,14 +15,20 @@
     "url": "https://github.com/gameofbombs/pixi-display.git"
   },
   "scripts": {
-    "start": "gulp && gulp watch",
-    "test": "gulp && testem ci",
-    "build": "gulp",
-    "docs": "jsdoc -c ./gulp/util/jsdoc.conf.json -R README.md"
+    "clean": "rimraf bin && mkdirp bin",
+    "prestart": "npm run clean",
+    "start": "parallelshell \"npm run watch:lint\" \"npm run watch\"",
+    "watch": "pixify -o pixi-display -w",
+    "watch:lint": "watch \"jshint --reporter=scripts/reporter.js scripts src test || exit 0\" src",
+    "lint": "jshint --reporter=scripts/reporter.js scripts src",
+    "prebuild": "npm run lint && npm run clean",
+    "build": "pixify -o pixi-display",
+    "docs": "jsdoc -c scripts/jsdoc.conf.json -R README.md"
   },
   "files": [
     "bin/",
     "src/",
+    "CONTRIBUTING.md",
     "LICENSE",
     "package.json",
     "README.md"
@@ -31,37 +37,24 @@
     "glslify": "^5.0.2"
   },
   "devDependencies": {
-    "browserify": "^11.1.0",
     "browserify-versionify": "^1.0.6",
-    "chai": "^3.2.0",
-    "del": "^2.0.2",
-    "gulp": "^3.9.0",
-    "gulp-cached": "^1.1.0",
-    "gulp-concat": "^2.6.0",
-    "gulp-debug": "^2.1.0",
-    "gulp-jshint": "^2.0.0",
-    "gulp-mirror": "^1.0.0",
-    "gulp-plumber": "^1.0.1",
-    "gulp-rename": "^1.2.2",
-    "gulp-sourcemaps": "^1.5.2",
-    "gulp-uglify": "^1.5.1",
-    "gulp-util": "^3.0.6",
-    "jaguarjs-jsdoc": "git+https://github.com/davidshimjs/jaguarjs-jsdoc.git",
+    "del": "^2.2.0",
+    "jaguarjs-jsdoc": "^1.0.1",
     "jsdoc": "^3.4.0",
-    "jshint": "^2.9.1",
-    "jshint-summary": "^0.4.0",
+    "jshint": "^2.9.2",
+    "jshint-stylish": "^2.2.0",
+    "jshint-stylish-summary": "^0.1.2",
     "minimist": "^1.2.0",
-    "mocha": "^2.4.5",
-    "require-dir": "^0.3.0",
-    "run-sequence": "^1.1.2",
-    "testem": "^0.9.4",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0",
-    "watchify": "^3.7.0"
+    "mkdirp": "^0.5.1",
+    "parallelshell": "^2.0.0",
+    "pixify": "^1.4.0",
+    "rimraf": "^2.5.3",
+    "watch": "^0.19.1"
   },
   "browserify": {
     "transform": [
-      "glslify"
+      "glslify",
+      "browserify-versionify"
     ]
   }
 }
