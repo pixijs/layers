@@ -5,6 +5,8 @@ For older versions of PIXI (<= 4.3.0) please look in "v4.0" branch
 
 Compiled files are located in "bin" folder
 
+### Example
+
 Please look at [example](http://pixijs.github.io/examples/#/display/zorder.js)
 
 ### Some explanations
