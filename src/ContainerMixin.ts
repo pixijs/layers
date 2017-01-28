@@ -1,18 +1,21 @@
-/**
- * @mixin
- */
-var ContainerMixin = {
-    /**
-     * @type {PIXI.DisplayList}
-     */
+import WebGLRenderer = PIXI.WebGLRenderer;
+import CanvasRenderer = PIXI.CanvasRenderer;
+declare module PIXI {
+    export interface Container {
+        displayList: pixi_display.DisplayList;
+        displayChildren: Array<PIXI.DisplayObject>;
+        updateTransform(): void;
+        renderCanvas(renderer: CanvasRenderer): void;
+        renderWebGL(renderer: WebGLRenderer): void;
+        containerRenderWebGL(renderer: WebGLRenderer): void;
+        containerRenderCanvas(renderer: CanvasRenderer): void;
+    }
+}
+
+(Object as any).assign(PIXI.Container.prototype, {
     displayList: null,
-
-    /**
-     * calculated display children in last
-     * @type {PIXI.DisplayObject[]}
-     */
     displayChildren: null,
-
+    displayParent: null,
     updateTransform: function () {
         if (!this.visible) {
             return;
@@ -22,13 +25,7 @@ var ContainerMixin = {
             this.displayList.update(this);
         }
     },
-
-    /**
-     * Renders the object using the Canvas renderer
-     *
-     * @param renderer {PIXI.CanvasRenderer} The renderer
-     */
-    renderCanvas: function (renderer) {
+    renderCanvas: function (renderer: CanvasRenderer) {
         if (!this.visible) {
             this.displayOrder = 0;
             return;
@@ -50,13 +47,7 @@ var ContainerMixin = {
 
         this.containerRenderCanvas(renderer);
     },
-
-    /**
-     * Renders the object using the WebGL renderer
-     *
-     * @param renderer {PIXI.WebGLRenderer} The renderer
-     */
-    renderWebGL: function (renderer) {
+    renderWebGL: function (renderer: WebGLRenderer) {
         if (!this.visible) {
             this.displayOrder = 0;
             return;
@@ -76,11 +67,8 @@ var ContainerMixin = {
             return;
         }
 
-
         this.containerRenderWebGL(renderer);
     },
     containerRenderWebGL: PIXI.Container.prototype.renderWebGL,
     containerRenderCanvas: PIXI.Container.prototype.renderCanvas
-};
-
-module.exports = ContainerMixin;
+});

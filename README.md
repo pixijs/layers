@@ -1,7 +1,9 @@
 # pixi-display
 Allows to change rendering order of pixi-v4 containers without changing the scene graph
 
-Compiled files of all gameofbombs plugins are located in [pixi-bin](https://github.com/gameofbombs/pixi-bin/tree/master/bin/plugins)
+For older versions of PIXI (<= 4.3.0) please look in "v4.0" branch
+
+Compiled files are located in "bin" folder
 
 Please look at [example](http://pixijs.github.io/examples/#/display/zorder.js)
 
