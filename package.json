@@ -6,7 +6,8 @@
   "contributors": [
     "Ivan Popelyshev <ivan.popelyshev@gmail.com>"
   ],
-  "main": "./src/index.js",
+  "main": "./bin/pixi-display.js",
+  "types": "./bin/pixi-display.d.ts",
   "homepage": "http://www.pixijs.com/",
   "bugs": "https://github.com/gameofbombs/pixi-display/issues",
   "license": "MIT",
