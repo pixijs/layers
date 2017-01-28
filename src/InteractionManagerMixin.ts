@@ -106,9 +106,19 @@ module pixi_display {
 
         },
 
-        processInteractive: function (interactionEvent: InteractionEvent, displayObject: DisplayObject, func: Function, hitTest: boolean, interactive: boolean) {
+        processInteractive: function (strangeStuff: InteractionEvent | Point, displayObject: DisplayObject, func: Function, hitTest: boolean, interactive: boolean) {
+            //older versions
+            var interactionEvent: InteractionEvent = null;
+            var point: Point = null;
+            if ((strangeStuff as InteractionEvent).data &&
+                (strangeStuff as InteractionEvent).data.global) {
+                interactionEvent = strangeStuff as InteractionEvent;
+                point = interactionEvent.data.global;
+            } else {
+                point = strangeStuff as Point;
+            }
             this._startInteractionProcess();
-            this._displayProcessInteractive(interactionEvent.data.global, displayObject, hitTest ? 0 : Infinity, false);
+            this._displayProcessInteractive(point, displayObject, hitTest ? 0 : Infinity, false);
             this._finishInteractionProcess(interactionEvent, func);
         },
 
@@ -144,14 +154,26 @@ module pixi_display {
             var q = queue[0];
             var i = 0;
             for (; i < q.length; i++) {
-                func(event, q[i], false);
+                if (event) {
+                    //v4.3
+                    func(event, q[i], false);
+                } else {
+                    //old
+                    func(q[i], false);
+                }
             }
             q = queue[1];
             for (i = 0; i < q.length; i++) {
-                if (!event.target) {
-                    event.target = q[i];
+                if (event) {
+                    //v4.3
+                    if (!event.target) {
+                        event.target = q[i];
+                    }
+                    func(event, q[i], true);
+                } else {
+                    //old
+                    func(q[i], true);
                 }
-                func(event, q[i], true);
             }
         }
     });

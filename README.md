@@ -1,8 +1,6 @@
 # pixi-display
 Allows to change rendering order of pixi-v4 containers without changing the scene graph
 
-For older versions of PIXI (<= 4.3.0) please look in "v4.0" branch
-
 Compiled files are located in "bin" folder
 
 ### Example
