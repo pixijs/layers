@@ -8,13 +8,18 @@ module pixi_display {
     import CanvasRenderer = PIXI.CanvasRenderer;
     import DisplayObject = PIXI.DisplayObject;
     export class Layer extends Container {
-        constructor() {
+        constructor(group: Group = null) {
             super();
+            if (group != null) {
+                this.group = group;
+            } else {
+                this.group = new Group(0, false);
+            }
         }
 
         isLayer = true;
         displayChildren: Array<DisplayObject> = [];
-        group = new DisplayGroup(false);
+        group: Group = null;
 
         renderWebGL(renderer: WebGLRenderer) {
 
@@ -25,7 +30,7 @@ module pixi_display {
         }
 
         beginWork() {
-
+            this.group.check();
         }
 
         endWork() {

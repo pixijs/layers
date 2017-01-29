@@ -28,15 +28,19 @@ module pixi_display {
 
         _lastUpdateId = -1;
 
+        /**
+         * default zIndex value for layers that are created with this Group
+         * @type {number}
+         */
+        zIndex = 0;
+
         enableSort = false;
 
-        constructor(sorting: boolean | Function) {
+        constructor(zIndex: number, sorting: boolean | Function) {
             super();
 
-            /**
-             * sort elements inside or not
-             * @type {boolean}
-             */
+            this.zIndex = zIndex;
+
             this.enableSort = !!sorting;
 
             if (typeof sorting === 'function') {
@@ -66,8 +70,8 @@ module pixi_display {
         /**
          * used only by displayList before sorting takes place
          */
-        add(displayObject: DisplayObject) {
-            this.check();
+        addDisplayObject(stage: Stage, displayObject: DisplayObject) {
+            this.check(stage);
             if (this._activeLayer) {
                 this._activeLayer.displayChildren.push(displayObject);
             } else {
@@ -75,11 +79,39 @@ module pixi_display {
             }
         };
 
-        check() {
+        bindLayer(stage: Stage, layer: Layer) {
+            this.check(stage);
+            if (this._activeLayer != null) {
+                Group.conflict();
+            }
+            this._activeLayer = layer;
+            this._activeStage = stage;
+        }
+
+        check(stage: Stage) {
             if (this._lastUpdateId < Group._layerUpdateId) {
                 this._lastUpdateId = Group._layerUpdateId;
                 this.clear();
+            } else {
+                let current = this._activeStage;
+                while (current && current != stage) {
+                    current = current._activeParentStage;
+                }
+                this._activeStage = current;
+                if (current == null) {
+                    this.clear();
+                    return
+                }
             }
-        };
+        }
+
+        static _lastLayerConflict = 0;
+
+        static conflict() {
+            if (Group._lastLayerConflict + 5000 < Date.now()) {
+                Group._lastLayerConflict = Date.now();
+                console.log("PIXI-display plugin found two layers with the same group in one stage - that's not healthy. Please place a breakpoint here and debug it");
+            }
+        }
     }
 }

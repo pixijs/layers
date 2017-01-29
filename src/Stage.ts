@@ -17,6 +17,8 @@ module pixi_display {
          */
         _activeLayers: Array<Layer> = [];
 
+        _activeParentStage: Stage = null;
+
         /**
          * clears all display lists that were used in last rendering session
          * please clear it when you stop using this displayList, otherwise you may have problems with GC in some cases
@@ -39,114 +41,56 @@ module pixi_display {
          * @private
          */
         _addRecursive(displayObject: DisplayObject) {
-            if ((displayObject as Layer).isLayer) {
-
-            }
-
-            var container = displayObject as Container;
-            if (!container.visible || !container.renderable) {
+            if (!displayObject.visible) {
                 return;
             }
-            var groups = this.displayGroups;
-            var group = parent.displayGroup;
 
-            container.updateOrder = this.totalElements++;
-            if (container.displayGroup) {
-                group = container.displayGroup;
-                if (!group.currentDisplayList) {
-                    group.currentDisplayList = this;
-                    group.currentIndex = groups.length;
-                    groups.push(group);
-                }
-                group.add(container);
-
-                container.displayParent = container;
-            } else {
-                container.displayParent = parent;
-                if (!parent.displayChildren) {
-                    parent.displayChildren = [];
-                }
-                parent.displayChildren.push(container);
+            if ((displayObject as Layer).isLayer) {
+                const layer = displayObject as Layer;
+                this._activeLayers.push(layer);
+                layer.beginWork();
             }
 
-            if (container.displayFlag !== PIXI.DISPLAY_FLAG.MANUAL_CONTAINER) {
-                var children = container.children;
-                if (children && children.length > 0) {
-                    if ((container as any)._mask || (container as any)._filters && (container as any)._filters.length || container.displayList) {
-                        container.displayFlag = PIXI.DISPLAY_FLAG.AUTO_CONTAINER;
-                    } else {
-                        container.displayFlag = PIXI.DISPLAY_FLAG.AUTO_CHILDREN;
-                        for (var i = 0; i < children.length; i++) {
-                            this._addRecursive(children[i], container.displayParent);
-                        }
-                    }
-                } else {
-                    container.displayFlag = PIXI.DISPLAY_FLAG.AUTO_OBJECT;
+            if (displayObject != this && (displayObject as Stage).isStage) {
+                const stage = displayObject as Stage;
+                stage.updateAsChildStage(this);
+                return;
+            }
+
+            if (displayObject.parentGroup != null) {
+                displayObject.parentGroup.addDisplayObject(this, displayObject);
+            }
+
+            if (displayObject.alpha <= 0 || !displayObject.renderable || !displayObject.layerableChildren) {
+                return;
+            }
+
+            const children = (displayObject as Container).children;
+            if (children && children.length) {
+                for (let i = 0; i < children.length; i++) {
+                    this._addRecursive(children[i]);
                 }
             }
-        };
+        }
 
-        updateDisplayLayers() {
-            Group._layerUpdateId++;
-            const children = this.children;
-            for (let i=0;i<children.length;i++) {
-                this._addRecursive(children[i], this)
-            }
-        };
-
-        /**
-         * Called from container that owns this display list
-         * @param parentContainer
-         */
-        update(parentContainer: Container) {
+        _updateStageInner() {
             this.clear();
-            var tempGroup = parentContainer.displayGroup;
-            this.displayGroups.push(this.defaultDisplayGroup);
-            this.defaultDisplayGroup.add(parentContainer);
+            this._addRecursive(this);
+            const layers = this._activeLayers;
+            for (let i = 0; i < layers.length; i++) {
+                layers[i].endWork();
+            }
+        }
 
-            this.container = parentContainer;
-            var children = parentContainer.children;
-            var i = 0;
-            for (i = 0; i < children.length; i++) {
-                this._addRecursive(children[i], parentContainer);
-            }
-            var groups = this.displayGroups;
-            groups.sort(DisplayList.compareZIndex);
-            for (i = 0; i < groups.length; i++) {
-                groups[i].currentIndex = i;
-                groups[i].update();
-            }
-            this.emit('afterUpdate');
+        updateAsChildStage(stage: Stage) {
+            this._activeParentStage = stage;
+            this._updateStageInner();
+        }
+
+        updateStage() {
+            this._activeParentStage = null;
+            Group._layerUpdateId++;
+            this._updateStageInner();
         };
-
-        /**
-         * renders container with webgl context
-         * @param parentContainer
-         * @param renderer
-         */
-        renderWebGL(renderer: WebGLRenderer) {
-            //prevent recursion ;)
-            parentContainer.displayFlag = PIXI.DISPLAY_FLAG.AUTO_CHILDREN;
-            //lets do it!
-            var groups = this.displayGroups;
-            for (var i = 0; i < groups.length; i++) {
-                var group = groups[i];
-                group.renderWebGL(parentContainer, renderer);
-            }
-        };
-
-        /**
-         * renders container with canvas2d context
-         * @param parentContainer
-         * @param renderer
-         */
-        renderCanvas(renderer: CanvasRenderer) {
-            var groups = this.displayGroups;
-            for (var i = 0; i < groups.length; i++) {
-                var group = groups[i];
-                group.renderCanvas(parentContainer, renderer);
-            }
-        };
-
     }
 }

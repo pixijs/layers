@@ -5,7 +5,7 @@ declare module PIXI {
          *
          * Always null for layers
          */
-        parentGroup: pixi_display.DisplayGroup,
+        parentGroup: pixi_display.Group,
 
         /**
          * Object will be rendered
