@@ -25,7 +25,7 @@ module pixi_display {
          */
         clear() {
             this._activeLayers.length = 0;
-        };
+        }
 
         /**
          * alias for clear()
@@ -33,7 +33,7 @@ module pixi_display {
          */
         destroy() {
             this.clear();
-        };
+        }
 
         /**
          *

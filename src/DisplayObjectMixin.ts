@@ -1,10 +1,5 @@
 declare module PIXI {
     export interface DisplayObject {
-        /**
-         *
-         *
-         * Always null for layers
-         */
         parentGroup: pixi_display.Group,
 
         /**
@@ -17,6 +12,8 @@ declare module PIXI {
          */
         parentLayer: pixi_display.Layer,
 
+
+        _activeParentLayer: pixi_display.Layer,
         /**
          * zOrder is floating point number, distance between screen and object
          * Objects with largest zOrder will appear first in their Layer, if zOrder sorting is enabled
@@ -49,6 +46,7 @@ declare module PIXI {
 
 (Object as any).assign(PIXI.DisplayObject.prototype, {
     parentLayer: null,
+    _activeParentLayer: null,
     parentGroup: null,
     zOrder: 0,
     zIndex: 0,

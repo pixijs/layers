@@ -56,7 +56,7 @@ module pixi_display {
                 return -1;
             }
             return a.updateOrder - b.updateOrder;
-        };
+        }
 
         /**
          * clears temporary variables
@@ -65,19 +65,20 @@ module pixi_display {
             this._activeLayer = null;
             this._activeStage = null;
             this._activeChildren.length = 0;
-        };
+        }
 
         /**
          * used only by displayList before sorting takes place
          */
         addDisplayObject(stage: Stage, displayObject: DisplayObject) {
             this.check(stage);
+            displayObject._activeParentLayer = this._activeLayer;
             if (this._activeLayer) {
                 this._activeLayer.displayChildren.push(displayObject);
             } else {
                 this._activeChildren.push(displayObject);
             }
-        };
+        }
 
         bindLayer(stage: Stage, layer: Layer) {
             this.check(stage);

@@ -3,7 +3,6 @@ declare module PIXI {
     export interface Container {
         containerRenderWebGL(renderer: WebGLRenderer): void;
         containerRenderCanvas(renderer: CanvasRenderer): void;
-        updateDisplayLayers(renderer: WebGLRenderer | CanvasRenderer): void;
     }
 }
 
@@ -14,7 +13,7 @@ module pixi_display {
 
     (Object as any).assign(Container.prototype, {
         renderWebGL: function (renderer: WebGLRenderer): void {
-            if (this.displayLayer && this.displayLayer != renderer._activeLayer) {
+            if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
                 return;
             }
 
@@ -33,7 +32,7 @@ module pixi_display {
             this.containerRenderWebGL(renderer);
         },
         renderCanvas: function (renderer: CanvasRenderer): void {
-            if (this.displayLayer && this.displayLayer != renderer._activeLayer) {
+            if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
                 return;
             }
 
