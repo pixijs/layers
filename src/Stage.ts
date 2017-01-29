@@ -1,53 +1,28 @@
 module pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
-    import utils = PIXI.utils;
-    export class DisplayList extends utils.EventEmitter {
-        /**
-         * Children that were rendered in last run
-         * @type {Array}
-         */
-        displayGroups: Array<DisplayGroup>;
-
-        container: Container = null;
-
-        /**
-         * how many elements were rendered by display list last time
-         * also it is used to generate updateOrder for them
-         * @type {number}
-         */
-        totalElements = 0;
-
-        defaultDisplayGroup: DisplayGroup;
-
-        /**
-         * A component for container, sorts all children inside according to their displayGroups
-         *
-         * @class
-         * @extends EventEmitter
-         * @memberof PIXI
-         */
+    import WebGLRenderer = PIXI.WebGLRenderer;
+    /**
+     * Container for layers
+     *
+     */
+    export class Stage extends Layer {
         constructor() {
             super();
-
-            this.displayGroups = [];
-
-            this.defaultDisplayGroup = new DisplayGroup(0, false);
         }
 
+        isStage = true;
+        /**
+         * Found layers
+         */
+        _activeLayers: Array<Layer> = [];
 
         /**
          * clears all display lists that were used in last rendering session
          * please clear it when you stop using this displayList, otherwise you may have problems with GC in some cases
          */
         clear() {
-            var list = this.displayGroups;
-            for (var i = 0; i < list.length; i++) {
-                list[i].clear();
-            }
-            list.length = 0;
-            this.totalElements = 0;
-            this.container = null;
+            this._activeLayers.length = 0;
         };
 
         /**
@@ -58,20 +33,16 @@ module pixi_display {
             this.clear();
         };
 
-        static compareZIndex(a: DisplayGroup, b: DisplayGroup) {
-            if (a.zIndex !== b.zIndex) {
-                return a.zIndex - b.zIndex;
-            }
-            return a.currentIndex - b.currentIndex;
-        };
-
         /**
          *
-         * @param displayObject {PIXI.DisplayObject} container that we are adding to displaylist
-         * @param parent {PIXI.Container} it is not direct parent, but some of ancestors
+         * @param displayObject {PIXI.DisplayObject} container that we are adding to Stage
          * @private
          */
-        _addRecursive(displayObject: DisplayObject, parent: Container) {
+        _addRecursive(displayObject: DisplayObject) {
+            if ((displayObject as Layer).isLayer) {
+
+            }
+
             var container = displayObject as Container;
             if (!container.visible || !container.renderable) {
                 return;
@@ -115,6 +86,14 @@ module pixi_display {
             }
         };
 
+        updateDisplayLayers() {
+            Group._layerUpdateId++;
+            const children = this.children;
+            for (let i=0;i<children.length;i++) {
+                this._addRecursive(children[i], this)
+            }
+        };
+
         /**
          * Called from container that owns this display list
          * @param parentContainer
@@ -145,7 +124,7 @@ module pixi_display {
          * @param parentContainer
          * @param renderer
          */
-        renderWebGL(parentContainer: Container, renderer: WebGLRenderer) {
+        renderWebGL(renderer: WebGLRenderer) {
             //prevent recursion ;)
             parentContainer.displayFlag = PIXI.DISPLAY_FLAG.AUTO_CHILDREN;
             //lets do it!
@@ -161,7 +140,7 @@ module pixi_display {
          * @param parentContainer
          * @param renderer
          */
-        renderCanvas(parentContainer: Container, renderer: CanvasRenderer) {
+        renderCanvas(renderer: CanvasRenderer) {
             var groups = this.displayGroups;
             for (var i = 0; i < groups.length; i++) {
                 var group = groups[i];

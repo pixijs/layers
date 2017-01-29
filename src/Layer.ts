@@ -12,8 +12,9 @@ module pixi_display {
             super();
         }
 
-        _renderSessionId = 0;
+        isLayer = true;
         displayChildren: Array<DisplayObject> = [];
+        group = new DisplayGroup(false);
 
         renderWebGL(renderer: WebGLRenderer) {
 
@@ -22,5 +23,30 @@ module pixi_display {
         renderCanvas(renderer: CanvasRenderer) {
 
         }
+
+        beginWork() {
+
+        }
+
+        endWork() {
+
+        }
+
+        updateDisplayLayers() {
+
+        }
+
+        static compareZIndex(a: DisplayObject, b: DisplayObject) {
+            if (a.zIndex !== b.zIndex) {
+                return a.zIndex - b.zIndex;
+            }
+            if (a.zOrder > b.zOrder) {
+                return 1;
+            }
+            if (a.zOrder < b.zOrder) {
+                return -1;
+            }
+            return a.updateOrder - b.updateOrder;
+        };
     }
 }
