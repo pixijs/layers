@@ -1,29 +1,35 @@
 declare module PIXI {
     export interface DisplayObject {
         /**
+         *
+         *
+         * Always null for layers
+         */
+        displayGroup: pixi_display.Group,
+
+        /**
+         * Object will be rendered
+         *
          * please specify it to handle zOrder and zIndex
-         * @type {PIXI.DisplayGroup}
+         *
+         * its always null for layers
+         *
          */
-        displayGroup: pixi_display.DisplayGroup,
+        displayLayer: pixi_display.Layer,
 
         /**
-         * calculated inside displayList. Can be set to manual mode
-         * @type {number}
-         */
-        displayFlag: number,
-
-        /**
-         * calculated inside displayList. Cleared on displayList.clear()
-         * Equal to 'this' if displayGroup is specified
-         * @type {PIXI.Container}
-         */
-        displayParent: PIXI.Container,
-
-        /**
-         * zOrder is distance between screen and object. Objects with largest zOrder will appear first in their DisplayGroup
+         * zOrder is floating point number, distance between screen and object
+         * Objects with largest zOrder will appear first in their Layer, if zOrder sorting is enabled
          * @type {number}
          */
         zOrder: number,
+
+        /**
+         * zIndex is integer number, the number of layer
+         * Objects with least zOrder appear first in their Layer, if zIndex sorting is enabled
+         * @type {number}
+         */
+        zIndex: number,
 
         /**
          * updateOrder is calculated by DisplayList, it is required for sorting inside DisplayGroup
@@ -40,10 +46,9 @@ declare module PIXI {
 }
 
 (Object as any).assign(PIXI.DisplayObject.prototype, {
-    displayGroup: null,
-    displayFlag: PIXI.DISPLAY_FLAG.AUTO_CHILDREN,
-    displayParent: null,
+    displayLayer: null,
     zOrder: 0,
+    zIndex: 0,
     updateOrder: 0,
     displayOrder: 0
 });

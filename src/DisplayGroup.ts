@@ -12,6 +12,8 @@ module pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
     import utils = PIXI.utils;
+    import WebGLRenderer = PIXI.WebGLRenderer;
+    import CanvasRenderer = PIXI.CanvasRenderer;
 
     export class DisplayGroup extends utils.EventEmitter {
         computedChildren: Array<DisplayObject>;
