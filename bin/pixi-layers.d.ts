@@ -1,13 +1,5 @@
 /// <reference types="pixi.js" />
 declare module PIXI {
-    var DISPLAY_FLAG: {
-        AUTO_CHILDREN: number;
-        AUTO_CONTAINER: number;
-        AUTO_OBJECT: number;
-        MANUAL_CONTAINER: number;
-    };
-}
-declare module PIXI {
     interface Container {
         containerRenderWebGL(renderer: WebGLRenderer): void;
         containerRenderCanvas(renderer: CanvasRenderer): void;

@@ -1,9 +1,3 @@
-PIXI.DISPLAY_FLAG = {
-    AUTO_CHILDREN: 0,
-    AUTO_CONTAINER: 1,
-    AUTO_OBJECT: 2,
-    MANUAL_CONTAINER: 3
-};
 var pixi_display;
 (function (pixi_display) {
     var Container = PIXI.Container;
