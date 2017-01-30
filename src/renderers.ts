@@ -25,7 +25,6 @@ module pixi_display {
 
     (Object as any).assign(WebGLRenderer.prototype, {
         _lastDisplayOrder: 0,
-        _renderSessionId: 0,
         _activeLayer: null,
 
         incDisplayOrder() {
@@ -39,14 +38,15 @@ module pixi_display {
                 this._lastDisplayOrder = 0;
             }
             this._activeLayer = null;
-            this._renderSessionId++;
+            if ((displayObject as Stage).isStage) {
+                (displayObject as Stage).updateStage()
+            }
             this._oldRender(displayObject, renderTexture, clear, transform, skipUpdateTransform);
         }
     });
 
     (Object as any).assign(CanvasRenderer.prototype, {
         _lastDisplayOrder: 0,
-        _renderSessionId: 0,
         _activeLayer: null,
 
         incDisplayOrder() {
@@ -60,7 +60,9 @@ module pixi_display {
                 this._lastDisplayOrder = 0;
             }
             this._activeLayer = null;
-            this._renderSessionId++;
+            if ((displayObject as Stage).isStage) {
+                (displayObject as Stage).updateStage()
+            }
             this._oldRender(displayObject, renderTexture, clear, transform, skipUpdateTransform);
         }
     });

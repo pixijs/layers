@@ -11,7 +11,12 @@ module pixi_display {
             super();
         }
 
+        static _updateOrderCounter: number = 0;
+
         isStage = true;
+
+        _tempGroups: Array<DisplayObject> = [];
+
         /**
          * Found layers
          */
@@ -25,6 +30,7 @@ module pixi_display {
          */
         clear() {
             this._activeLayers.length = 0;
+            this._tempGroups.length = 0;
         }
 
         /**
@@ -48,7 +54,7 @@ module pixi_display {
             if ((displayObject as Layer).isLayer) {
                 const layer = displayObject as Layer;
                 this._activeLayers.push(layer);
-                layer.beginWork();
+                layer.beginWork(this);
             }
 
             if (displayObject != this && (displayObject as Stage).isStage) {
@@ -57,10 +63,16 @@ module pixi_display {
                 return;
             }
 
-            if (displayObject.parentGroup != null) {
+            const group = displayObject.parentGroup;
+            if (group != null) {
                 displayObject.parentGroup.addDisplayObject(this, displayObject);
             }
+            const layer = displayObject.parentLayer;
+            if (layer != null) {
+                layer.group.addDisplayObject(this, displayObject);
+            }
 
+            displayObject.updateOrder = ++Stage._updateOrderCounter;
             if (displayObject.alpha <= 0 || !displayObject.renderable || !displayObject.layerableChildren) {
                 return;
             }
@@ -84,6 +96,7 @@ module pixi_display {
 
         updateAsChildStage(stage: Stage) {
             this._activeParentStage = stage;
+            Stage._updateOrderCounter = 0;
             this._updateStageInner();
         }
 

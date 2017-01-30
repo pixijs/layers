@@ -28,6 +28,11 @@ module pixi_display {
 
         _lastUpdateId = -1;
 
+        //TODO: handle orphan groups
+        //TODO: handle groups that don't want to be drawn in parent
+        canDrawWithoutLayer = false;
+        canDrawInParentStage = true;
+
         /**
          * default zIndex value for layers that are created with this Group
          * @type {number}
@@ -48,14 +53,57 @@ module pixi_display {
             }
         }
 
-        static compareZOrder(a: DisplayObject, b: DisplayObject) {
-            if (a.zOrder < b.zOrder) {
-                return 1;
+        _tempResult: Array<DisplayObject> = [];
+        _tempZero: Array<DisplayObject> = [];
+
+        useZeroOptimization: boolean = false;
+
+        doSort(layer: Layer, sorted: Array<DisplayObject>) {
+            if (this.useZeroOptimization) {
+                this.doSortWithZeroOptimization(layer, sorted);
+            } else {
+                sorted.sort(Group.compareZIndex);
+            }
+        }
+
+        static compareZIndex(a: DisplayObject, b: DisplayObject) {
+            if (a.zIndex !== b.zIndex) {
+                return a.zIndex - b.zIndex;
             }
             if (a.zOrder > b.zOrder) {
+                return 1;
+            }
+            if (a.zOrder < b.zOrder) {
                 return -1;
             }
             return a.updateOrder - b.updateOrder;
+        }
+
+        doSortWithZeroOptimization(layer: Layer, sorted: Array<DisplayObject>) {
+            throw new Error("not implemented yet");
+            //default sorting
+            // const result = this._tempResult;
+            // const zero = this._tempZero;
+            // for (let i = 0; i < sorted.length; i++) {
+            //     const elem = sorted[i];
+            //     if (elem.zIndex == 0 && elem.zOrder == 0) {
+            //         zero.push(elem);
+            //     } else {
+            //         result.push(elem);
+            //     }
+            // }
+            // if (zero.length == 0) {
+            //     sorted.sort(Group.compareZOrder);
+            // } else {
+            //     result.sort(Group.compareZOrder);
+            //     let j = 0;
+            //     for (let i = 0; i < result.length; i++) {
+            //         const elem = result[i];
+            //         if (elem.zIndex < 0 && elem.zIndex == 0 && elem.zOrder > 0) {
+            //             sorted[j++] = result[i]++;
+            //         }
+            //     }
+            // }
         }
 
         /**
@@ -74,13 +122,18 @@ module pixi_display {
             this.check(stage);
             displayObject._activeParentLayer = this._activeLayer;
             if (this._activeLayer) {
-                this._activeLayer.displayChildren.push(displayObject);
+                this._activeLayer._activeChildren.push(displayObject);
             } else {
                 this._activeChildren.push(displayObject);
             }
         }
 
-        bindLayer(stage: Stage, layer: Layer) {
+        /**
+         * called when corresponding layer is found in current stage
+         * @param stage
+         * @param layer
+         */
+        foundLayer(stage: Stage, layer: Layer) {
             this.check(stage);
             if (this._activeLayer != null) {
                 Group.conflict();
@@ -89,11 +142,22 @@ module pixi_display {
             this._activeStage = stage;
         }
 
+        /**
+         * called after stage finished the work
+         * @param stage
+         */
+        foundStage(stage: Stage) {
+            if (!this._activeLayer && !this.canDrawInParentStage) {
+                this.clear();
+            }
+        }
+
         check(stage: Stage) {
             if (this._lastUpdateId < Group._layerUpdateId) {
                 this._lastUpdateId = Group._layerUpdateId;
                 this.clear();
-            } else {
+                this._activeStage = stage;
+            } else if (this.canDrawInParentStage) {
                 let current = this._activeStage;
                 while (current && current != stage) {
                     current = current._activeParentStage;
