@@ -49,7 +49,7 @@ module pixi_display {
             this.enableSort = !!sorting;
 
             if (typeof sorting === 'function') {
-                this.on('add', sorting);
+                this.on('sort', sorting);
             }
         }
 
@@ -59,6 +59,11 @@ module pixi_display {
         useZeroOptimization: boolean = false;
 
         doSort(layer: Layer, sorted: Array<DisplayObject>) {
+            if ((this.listeners as any)('sort', true)) {
+                for (let i = 0; i < sorted.length; i++) {
+                    this.emit('sort', sorted[i]);
+                }
+            }
             if (this.useZeroOptimization) {
                 this.doSortWithZeroOptimization(layer, sorted);
             } else {
@@ -71,10 +76,10 @@ module pixi_display {
                 return a.zIndex - b.zIndex;
             }
             if (a.zOrder > b.zOrder) {
-                return 1;
+                return -1;
             }
             if (a.zOrder < b.zOrder) {
-                return -1;
+                return 1;
             }
             return a.updateOrder - b.updateOrder;
         }
