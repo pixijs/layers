@@ -1,5 +1,5 @@
 # pixi-layers
-Allows to change rendering order of pixi-v4 containers without changing the scene graph
+Allows to change rendering order of pixi containers without changing the scene graph
 
 Its new version of "pixi-display" API, it allows to combine reordering with filters and masks
 
@@ -7,12 +7,17 @@ Compiled files are located in "bin" folder
 
 ### Example
 
-[Lighting example](http://pixijs.github.io/examples/#/layers/multiply.js)
-
-[Groups example](http://pixijs.github.io/examples/#/layers/groups.js)
+[Lighting example](http://pixijs.github.io/examples/#/layers/lighting.js)
 
 [Z-order example](http://pixijs.github.io/examples/#/layers/zorder.js)
 
+### Compatibility
+
+Made for pixi-v4
+
+Compatible with v3 if you use [pixi-legacy](https://github.com/ivanpopelyshev/pixi-legacy)
+
+Not compatible with pixi-v2
 
 ### Some explanations
 
@@ -25,7 +30,7 @@ var layer = new PIXI.display.Layer();
 Pixi DisplayObject/Container can be rendered inside its layer instead of direct parent
 
 ```js
-bunnySprite.displayLayer = layer;
+bunnySprite.parentLayer = layer;
 ```
 
 Layer can order elements inside of it, by zIndex increase and then by zOrder decrease
@@ -41,7 +46,7 @@ layer.group.enableSort = true;
 You can check which objects were picked up into layer
 
 ```js
-stage.updateDisplayLayers();
+stage.updateStage();
 console.log(layer.displayChildren);
 
 //order of rendering: 
@@ -50,13 +55,13 @@ console.log(layer.displayChildren);
 // cloudSprite (index=2, order=0)
 ```
 
-updateDisplayLayers calls onSort, you can override it
+updateStage calls onSort, you can override it
 
 ```js
-layer.group.onSort = function(sprite, layer) { sprite.zOrder = -sprite.y }
+layer.group.on('sort', function(sprite) { sprite.zOrder = -sprite.y })
 ```
 
-Renderer will call "updateDisplayLayers" automatically, so you can check it after render too
+Renderer will call "updateStage" automatically, so you can check it after render too
 
 ```js
 renderer.render(stage);
@@ -75,10 +80,10 @@ When you move a character with attached sprites from different layers to a new s
 Instead, you can create a new display Group:
 
 ```
-var lightGroup = new PIXI.display.DisplayGroup();
+var lightGroup = new PIXI.display.Group();
 
-bunnySprite.displayGroup = lightGroup;
-lightLayer.displayGroup = lightGroup; // only one layer per stage can be bound to same group
+bunnySprite.parentGroup = lightGroup;
+var lightLayer = new PIXI.display.Layer(lightGroup); // only one layer per stage can be bound to same group
 ```
 
 Groups are working between different stages, so when you move bunny it will be rendered in its light layer.

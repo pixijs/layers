@@ -55,6 +55,10 @@ declare module PIXI {
     layerableChildren: true
 });
 
-if (PIXI.particles.ParticleContainer) {
+if (PIXI.particles && PIXI.particles.ParticleContainer) {
     PIXI.particles.ParticleContainer.prototype.layerableChildren = false;
+}
+
+if ((PIXI as any).ParticleContainer) {
+    (PIXI as any).ParticleContainer.prototype.layerableChildren = false;
 }
