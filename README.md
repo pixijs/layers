@@ -88,6 +88,26 @@ var lightLayer = new PIXI.display.Layer(lightGroup); // only one layer per stage
 
 Groups are working between different stages, so when you move bunny it will be rendered in its light layer.
 
+### The legend
+
+Stage is the city. Containers are buildings, simple sprites are people.
+
+Layers are office buildings. Office for googlers, office for bakers, office for account workers.
+
+Groups are occupation. If there's a googler, he's looking for google office in the same town.
+
+In render stage, some people are going to their offices and arrange by z-order/z-index/their rank in corporation.
+
+People who dont have occupation or office are working from home. And some people are actually living in offices, that happens ;)
+
+We can combine multiple Stage's into each other, like downtown, and child suburbs.
+ 
+In that case, people will look for offices in the same suburb, and if they dont find it, they'll go search one in the downtown.
+
+The only problem with this legend is that "people" and "buildings" are actually the same ;) 
+Whole building can be "home for googlers", but one person in it has its own occupation, he's from Yandex.
+It happens.
+
 ### Pros
 
 1. compatible with other implementations: does not change "container.children" order
