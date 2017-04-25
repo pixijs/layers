@@ -2,6 +2,7 @@ module pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
     import WebGLRenderer = PIXI.WebGLRenderer;
+    import IDestroyOptions = PIXI.IDestroyOptions;
     /**
      * Container for layers
      *
@@ -33,12 +34,9 @@ module pixi_display {
             this._tempGroups.length = 0;
         }
 
-        /**
-         * alias for clear()
-         * please call it if you stop using this displayList
-         */
-        destroy() {
+        destroy(options?: IDestroyOptions | boolean) {
             this.clear();
+            super.destroy(options);
         }
 
         /**
