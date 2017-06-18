@@ -96,7 +96,7 @@ declare module pixi_display {
 }
 declare module pixi_display {
     import DisplayObject = PIXI.DisplayObject;
-    import IDestroyOptions = PIXI.IDestroyOptions;
+    import DestroyOptions = PIXI.DestroyOptions;
     class Stage extends Layer {
         constructor();
         static _updateOrderCounter: number;
@@ -105,7 +105,7 @@ declare module pixi_display {
         _activeLayers: Array<Layer>;
         _activeParentStage: Stage;
         clear(): void;
-        destroy(options?: IDestroyOptions | boolean): void;
+        destroy(options?: DestroyOptions | boolean): void;
         _addRecursive(displayObject: DisplayObject): void;
         _updateStageInner(): void;
         updateAsChildStage(stage: Stage): void;
