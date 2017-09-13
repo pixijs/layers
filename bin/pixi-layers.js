@@ -171,7 +171,7 @@ var pixi_display;
     var InteractionManager = PIXI.interaction.InteractionManager;
     Object.assign(InteractionManager.prototype, {
         _queue: [[], []],
-        _displayProcessInteractive: function (point, displayObject, hitTestOrder, interactive) {
+        _displayProcessInteractive: function (point, displayObject, hitTestOrder, interactive, outOfMask) {
             if (!displayObject || !displayObject.visible) {
                 return 0;
             }
@@ -179,22 +179,25 @@ var pixi_display;
             if (displayObject.hitArea) {
                 interactiveParent = false;
             }
+            if (displayObject._activeParentLayer) {
+                outOfMask = false;
+            }
             var mask = displayObject._mask;
             if (hitTestOrder < Infinity && mask) {
                 if (!mask.containsPoint(point)) {
-                    hitTestOrder = Infinity;
+                    outOfMask = true;
                 }
             }
             if (hitTestOrder < Infinity && displayObject.filterArea) {
                 if (!displayObject.filterArea.contains(point.x, point.y)) {
-                    hitTestOrder = Infinity;
+                    outOfMask = true;
                 }
             }
             var children = displayObject.children;
             if (displayObject.interactiveChildren && children) {
                 for (var i = children.length - 1; i >= 0; i--) {
                     var child = children[i];
-                    var hitChild = this._displayProcessInteractive(point, child, hitTestOrder, interactiveParent);
+                    var hitChild = this._displayProcessInteractive(point, child, hitTestOrder, interactiveParent, outOfMask);
                     if (hitChild) {
                         if (!child.parent) {
                             continue;
@@ -204,7 +207,7 @@ var pixi_display;
                     }
                 }
             }
-            if (interactive) {
+            if (interactive && !outOfMask) {
                 if (hitTestOrder < displayObject.displayOrder) {
                     if (displayObject.hitArea) {
                         displayObject.worldTransform.applyInverse(point, this._tempPoint);
