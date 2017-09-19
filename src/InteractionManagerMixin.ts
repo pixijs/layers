@@ -173,7 +173,9 @@ module pixi_display {
                     if (!event.target) {
                         event.target = q[i];
                     }
-                    func(event, q[i], true);
+                    if (func) {
+                        func(event, q[i], true);
+                    }
                 } else {
                     //old
                     func(q[i], true);

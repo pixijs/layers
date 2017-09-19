@@ -47,7 +47,7 @@ Object.assign(PIXI.DisplayObject.prototype, {
 if (PIXI.particles && PIXI.particles.ParticleContainer) {
     PIXI.particles.ParticleContainer.prototype.layerableChildren = false;
 }
-if (PIXI.ParticleContainer) {
+else if (PIXI.ParticleContainer) {
     PIXI.ParticleContainer.prototype.layerableChildren = false;
 }
 var __extends = (this && this.__extends) || function (d, b) {
@@ -285,7 +285,9 @@ var pixi_display;
                     if (!event.target) {
                         event.target = q[i];
                     }
-                    func(event, q[i], true);
+                    if (func) {
+                        func(event, q[i], true);
+                    }
                 }
                 else {
                     func(q[i], true);
