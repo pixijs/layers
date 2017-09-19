@@ -160,7 +160,9 @@ module pixi_display {
             for (; i < q.length; i++) {
                 if (event) {
                     //v4.3
-                    func(event, q[i], false);
+                    if (func) {
+                        func(event, q[i], false);
+                    }
                 } else {
                     //old
                     func(q[i], false);

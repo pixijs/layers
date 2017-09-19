@@ -273,7 +273,9 @@ var pixi_display;
             var i = 0;
             for (; i < q.length; i++) {
                 if (event) {
-                    func(event, q[i], false);
+                    if (func) {
+                        func(event, q[i], false);
+                    }
                 }
                 else {
                     func(q[i], false);
