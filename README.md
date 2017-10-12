@@ -5,6 +5,8 @@ Its new version of "pixi-display" API, it allows to combine reordering with filt
 
 Compiled files are located in "bin" folder
 
+Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
+
 ### Example
 
 [Lighting example](http://pixijs.github.io/examples/#/layers/lighting.js)
