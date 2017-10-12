@@ -83,26 +83,32 @@ module pixi_display {
             }
 
             // no point running this if the item is not interactive or does not have an interactive parent.
-            if (interactive && !outOfMask) {
-                // if we are hit testing (as in we have no hit any objects yet)
-                // We also don't need to worry about hit testing if once of the displayObjects children has already been hit!
-                if (hitTestOrder < displayObject.displayOrder) {
-                    //pixi v4
-                    if (displayObject.hitArea) {
-                        displayObject.worldTransform.applyInverse(point, this._tempPoint);
-                        if (displayObject.hitArea.contains(this._tempPoint.x, this._tempPoint.y)) {
-                            hit = displayObject.displayOrder;
+            if (interactive) {
+                if (!outOfMask) {
+                    // if we are hit testing (as in we have no hit any objects yet)
+                    // We also don't need to worry about hit testing if once of the displayObjects children has already been hit!
+                    if (hitTestOrder < displayObject.displayOrder) {
+                        //pixi v4
+                        if (displayObject.hitArea) {
+                            displayObject.worldTransform.applyInverse(point, this._tempPoint);
+                            if (displayObject.hitArea.contains(this._tempPoint.x, this._tempPoint.y)) {
+                                hit = displayObject.displayOrder;
+                            }
+                        }
+                        else if ((displayObject as any).containsPoint) {
+                            if ((displayObject as any).containsPoint(point)) {
+                                hit = displayObject.displayOrder;
+                            }
                         }
                     }
-                    else if ((displayObject as any).containsPoint) {
-                        if ((displayObject as any).containsPoint(point)) {
-                            hit = displayObject.displayOrder;
-                        }
-                    }
-                }
 
-                if (displayObject.interactive) {
-                    this._queueAdd(displayObject, hit);
+                    if (displayObject.interactive) {
+                        this._queueAdd(displayObject, hit === Infinity ? 0 : hit);
+                    }
+                } else {
+                    if (displayObject.interactive) {
+                        this._queueAdd(displayObject, 0);
+                    }
                 }
             }
 
