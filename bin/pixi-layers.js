@@ -50,11 +50,16 @@ if (PIXI.particles && PIXI.particles.ParticleContainer) {
 else if (PIXI.ParticleContainer) {
     PIXI.ParticleContainer.prototype.layerableChildren = false;
 }
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var pixi_display;
 (function (pixi_display) {
     var utils = PIXI.utils;
@@ -207,22 +212,29 @@ var pixi_display;
                     }
                 }
             }
-            if (interactive && !outOfMask) {
-                if (hitTestOrder < displayObject.displayOrder) {
-                    if (displayObject.hitArea) {
-                        displayObject.worldTransform.applyInverse(point, this._tempPoint);
-                        if (displayObject.hitArea.contains(this._tempPoint.x, this._tempPoint.y)) {
-                            hit = displayObject.displayOrder;
+            if (interactive) {
+                if (!outOfMask) {
+                    if (hitTestOrder < displayObject.displayOrder) {
+                        if (displayObject.hitArea) {
+                            displayObject.worldTransform.applyInverse(point, this._tempPoint);
+                            if (displayObject.hitArea.contains(this._tempPoint.x, this._tempPoint.y)) {
+                                hit = displayObject.displayOrder;
+                            }
+                        }
+                        else if (displayObject.containsPoint) {
+                            if (displayObject.containsPoint(point)) {
+                                hit = displayObject.displayOrder;
+                            }
                         }
                     }
-                    else if (displayObject.containsPoint) {
-                        if (displayObject.containsPoint(point)) {
-                            hit = displayObject.displayOrder;
-                        }
+                    if (displayObject.interactive) {
+                        this._queueAdd(displayObject, hit === Infinity ? 0 : hit);
                     }
                 }
-                if (displayObject.interactive) {
-                    this._queueAdd(displayObject, hit);
+                else {
+                    if (displayObject.interactive) {
+                        this._queueAdd(displayObject, 0);
+                    }
                 }
             }
             return hit;
