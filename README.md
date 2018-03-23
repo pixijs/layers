@@ -3,7 +3,7 @@ Allows to change rendering order of pixi containers without changing the scene g
 
 Its new version of "pixi-display" API, it allows to combine reordering with filters and masks
 
-Compiled files are located in "bin" folder
+Compiled files are located in "dist" folder
 
 Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
 
@@ -13,13 +13,13 @@ Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
 
 [Z-order example](http://pixijs.github.io/examples/#/layers/zorder.js)
 
+[Normals example](http://pixijs.github.io/examples/#/layers/normals.js)
+
 ### Compatibility
 
 Made for pixi-v4
 
-Compatible with v3 if you use [pixi-legacy](https://github.com/ivanpopelyshev/pixi-legacy)
-
-Not compatible with pixi-v2
+Not compatible with v2, v3 and v5
 
 ### Some explanations
 
