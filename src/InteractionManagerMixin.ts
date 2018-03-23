@@ -4,7 +4,7 @@
  * @mixin
  */
 
-module pixi_display {
+namespace pixi_display {
     import InteractionManager = PIXI.interaction.InteractionManager;
     import DisplayObject = PIXI.DisplayObject;
     import Point = PIXI.Point;

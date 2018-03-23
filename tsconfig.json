@@ -5,13 +5,10 @@
 		"noImplicitAny": true,
 		"removeComments": true,
 		"preserveConstEnums": true,
-        "outFile": "bin/pixi-layers.js",
+        "outFile": "dist/pixi-layers.js",
         "sourceMap": true,
         "inlineSources": true,
-        "declaration": true,
-        "typeRoots": [
-          "lib/"
-        ]
+        "declaration": true
 	},
     "include": [
         "src/**/*"

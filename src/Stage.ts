@@ -1,7 +1,6 @@
-module pixi_display {
+namespace pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
-    import WebGLRenderer = PIXI.WebGLRenderer;
     import DestroyOptions = PIXI.DestroyOptions;
     /**
      * Container for layers

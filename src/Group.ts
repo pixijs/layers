@@ -8,7 +8,7 @@
  * @param sorting {boolean | Function} if you need to sort elements inside, please provide function that will set displayObject.zOrder accordingly
  */
 
-module pixi_display {
+namespace pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
     import utils = PIXI.utils;
@@ -29,7 +29,7 @@ module pixi_display {
         _lastUpdateId = -1;
 
         useRenderTexture: boolean = false;
-        clearColor : ArrayLike<number> = new Float32Array([0, 0, 0, 1]);
+        clearColor : ArrayLike<number> = new Float32Array([0, 0, 0, 0]);
 
         //TODO: handle orphan groups
         //TODO: handle groups that don't want to be drawn in parent

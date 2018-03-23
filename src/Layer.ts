@@ -2,13 +2,8 @@
  * Created by ivanp on 29.01.2017.
  */
 
-module pixi_display {
-	import Container = PIXI.Container;
-	import WebGLRenderer = PIXI.WebGLRenderer;
-	import CanvasRenderer = PIXI.CanvasRenderer;
-	import DisplayObject = PIXI.DisplayObject;
-
-	export class Layer extends Container {
+namespace pixi_display {
+	export class Layer extends PIXI.Container {
 		constructor(group: Group = null) {
 			super();
 			if (group != null) {
@@ -22,10 +17,10 @@ module pixi_display {
 
 		isLayer = true;
 		group: Group = null;
-		_activeChildren: Array<DisplayObject> = [];
-		_tempChildren: Array<DisplayObject> = null;
+		_activeChildren: Array<PIXI.DisplayObject> = [];
+		_tempChildren: Array<PIXI.DisplayObject> = null;
 		_activeStageParent: Stage = null;
-		_sortedChildren: Array<DisplayObject> = [];
+		_sortedChildren: Array<PIXI.DisplayObject> = [];
 		_tempLayerParent: Layer = null;
 		_thisRenderTexture: PIXI.RenderTexture = null;
 		_tempRenderTarget: PIXI.RenderTarget = null;
@@ -110,7 +105,7 @@ module pixi_display {
 			this.group.doSort(this, this._sortedChildren);
 		}
 
-		_preRender(renderer: WebGLRenderer | CanvasRenderer): boolean {
+		_preRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): boolean {
 			if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
 				return false;
 			}
@@ -146,13 +141,13 @@ module pixi_display {
 			return true;
 		}
 
-		_postRender(renderer: WebGLRenderer | CanvasRenderer) {
+		_postRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer) {
 			this.children = this._tempChildren;
 			renderer._activeLayer = this._tempLayerParent;
 			this._tempLayerParent = null;
 		}
 
-		_pushTexture(renderer: WebGLRenderer) {
+		_pushTexture(renderer: PIXI.WebGLRenderer) {
 			const screen = renderer.screen;
 
 			if (!this._thisRenderTexture) {
@@ -177,13 +172,13 @@ module pixi_display {
 			}
 		}
 
-		_popTexture(renderer: WebGLRenderer) {
+		_popTexture(renderer: PIXI.WebGLRenderer) {
 			renderer.currentRenderer.flush();
 			renderer.bindRenderTarget(this._tempRenderTarget);
 			this._tempRenderTarget = null;
 		}
 
-		renderWebGL(renderer: WebGLRenderer) {
+		renderWebGL(renderer: PIXI.WebGLRenderer) {
 			if (!this._preRender(renderer)) {
 				return;
 			}
@@ -200,14 +195,14 @@ module pixi_display {
 			}
 		}
 
-		renderCanvas(renderer: CanvasRenderer) {
+		renderCanvas(renderer: PIXI.CanvasRenderer) {
 			if (this._preRender(renderer)) {
 				this.containerRenderCanvas(renderer);
 				this._postRender(renderer);
 			}
 		}
 
-		destroy(options: any) {
+		destroy(options?: any) {
 			if (this._thisRenderTexture) {
 				this._thisRenderTexture.destroy(true);
 			}

@@ -1,13 +1,13 @@
 {
   "name": "pixi-layers",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Pixi.js plugin, allows to change rendering order of containers without changing the scene graph.",
   "author": "Ivan Popelyshev",
   "contributors": [
     "Ivan Popelyshev <ivan.popelyshev@gmail.com>"
   ],
-  "main": "./bin/pixi-layers.js",
-  "types": "./bin/pixi-layers.d.ts",
+  "main": "./dist/pixi-layers.js",
+  "types": "./dist/pixi-layers.d.ts",
   "homepage": "http://www.pixijs.com/",
   "bugs": "https://github.com/pixijs/pixi-display/issues",
   "license": "MIT",
@@ -16,15 +16,20 @@
     "url": "https://github.com/pixijs/pixi-display.git"
   },
   "scripts": {
-    "clean": "rimraf bin && mkdirp bin",
-    "prestart": "npm run clean",
-    "start": "parallelshell \"npm run watch\"",
+    "cleanup": "rimraf dist && mkdirp dist",
+    "prestart": "yarn cleanup",
+    "start": "parallelshell \"yarn watch\"",
     "watch": "tsc -w",
-    "prebuild": "npm run clean",
-    "build": "tsc"
+    "prebuild": "yarn cleanup",
+    "make:dts": "node scripts/make_dts.js",
+    "build": "tsc && yarn make:dts",
+    "check:browserify": "yarn checkpack -- browserify -e test/checkpack.ts",
+    "check:webpack": "yarn checkpack -- webpack -e test/checkpack.ts",
+    "check:vanillajs": "yarn checkpack -- vanillajs -e test/checkpack.ts",
+    "check:all": "yarn build && yarn check:browserify && yarn check:webpack && yarn check:vanillajs"
   },
   "files": [
-    "bin/",
+    "dist/",
     "src/",
     "CONTRIBUTING.md",
     "LICENSE",
@@ -33,15 +38,17 @@
     "README.md"
   ],
   "devDependencies": {
+    "checkpack": "^0.2.7",
     "del": "^2.2.0",
     "jaguarjs-jsdoc": "^1.0.1",
     "jsdoc": "^3.4.0",
     "mkdirp": "^0.5.1",
     "parallelshell": "^2.0.0",
     "rimraf": "^2.5.3",
-    "typescript": "^2.0.3"
+    "typescript": "^2.0.3",
+    "pixi.js": "^4.7.1"
   },
   "dependencies": {
-    "@types/pixi.js": "^4.5.6"
+    "@types/pixi.js": "^4.7.1"
   }
 }

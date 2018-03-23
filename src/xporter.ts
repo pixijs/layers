@@ -1,7 +1,3 @@
-declare module PIXI {
-    var display: typeof pixi_display;
+namespace pixi_display {
+	(PIXI as any).display = pixi_display;
 }
-
-(Object as any).assign(PIXI, {
-    display: pixi_display
-});

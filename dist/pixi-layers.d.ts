@@ -5,13 +5,13 @@ declare module PIXI {
         containerRenderCanvas(renderer: CanvasRenderer): void;
     }
 }
-declare module pixi_display {
+declare module PIXI.display {
 }
 declare module PIXI {
     interface DisplayObject {
-        parentGroup: pixi_display.Group;
-        parentLayer: pixi_display.Layer;
-        _activeParentLayer: pixi_display.Layer;
+        parentGroup: PIXI.display.Group;
+        parentLayer: PIXI.display.Layer;
+        _activeParentLayer: PIXI.display.Layer;
         zOrder: number;
         zIndex: number;
         updateOrder: number;
@@ -19,7 +19,7 @@ declare module PIXI {
         layerableChildren: boolean;
     }
 }
-declare module pixi_display {
+declare module PIXI.display {
     import DisplayObject = PIXI.DisplayObject;
     import utils = PIXI.utils;
     class Group extends utils.EventEmitter {
@@ -51,21 +51,17 @@ declare module pixi_display {
         static conflict(): void;
     }
 }
-declare module pixi_display {
+declare module PIXI.display {
 }
-declare module pixi_display {
-    import Container = PIXI.Container;
-    import WebGLRenderer = PIXI.WebGLRenderer;
-    import CanvasRenderer = PIXI.CanvasRenderer;
-    import DisplayObject = PIXI.DisplayObject;
-    class Layer extends Container {
+declare module PIXI.display {
+    class Layer extends PIXI.Container {
         constructor(group?: Group);
         isLayer: boolean;
         group: Group;
-        _activeChildren: Array<DisplayObject>;
-        _tempChildren: Array<DisplayObject>;
+        _activeChildren: Array<PIXI.DisplayObject>;
+        _tempChildren: Array<PIXI.DisplayObject>;
         _activeStageParent: Stage;
-        _sortedChildren: Array<DisplayObject>;
+        _sortedChildren: Array<PIXI.DisplayObject>;
         _tempLayerParent: Layer;
         _thisRenderTexture: PIXI.RenderTexture;
         _tempRenderTarget: PIXI.RenderTarget;
@@ -78,33 +74,32 @@ declare module pixi_display {
         getRenderTexture(): PIXI.RenderTexture;
         updateDisplayLayers(): void;
         doSort(): void;
-        _preRender(renderer: WebGLRenderer | CanvasRenderer): boolean;
-        _postRender(renderer: WebGLRenderer | CanvasRenderer): void;
-        _pushTexture(renderer: WebGLRenderer): void;
-        _popTexture(renderer: WebGLRenderer): void;
-        renderWebGL(renderer: WebGLRenderer): void;
-        renderCanvas(renderer: CanvasRenderer): void;
-        destroy(options: any): void;
+        _preRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): boolean;
+        _postRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): void;
+        _pushTexture(renderer: PIXI.WebGLRenderer): void;
+        _popTexture(renderer: PIXI.WebGLRenderer): void;
+        renderWebGL(renderer: PIXI.WebGLRenderer): void;
+        renderCanvas(renderer: PIXI.CanvasRenderer): void;
+        destroy(options?: any): void;
     }
 }
 declare module PIXI {
-    import Layer = pixi_display.Layer;
     interface WebGLRenderer {
-        _activeLayer: Layer;
+        _activeLayer: PIXI.display.Layer;
         _renderSessionId: number;
         _lastDisplayOrder: number;
         incDisplayOrder(): number;
     }
     interface CanvasRenderer {
-        _activeLayer: Layer;
+        _activeLayer: PIXI.display.Layer;
         _renderSessionId: number;
         _lastDisplayOrder: number;
         incDisplayOrder(): number;
     }
 }
-declare module pixi_display {
+declare module PIXI.display {
 }
-declare module pixi_display {
+declare module PIXI.display {
     import DisplayObject = PIXI.DisplayObject;
     import DestroyOptions = PIXI.DestroyOptions;
     class Stage extends Layer {
@@ -122,6 +117,5 @@ declare module pixi_display {
         updateStage(): void;
     }
 }
-declare module PIXI {
-    var display: typeof pixi_display;
+declare module PIXI.display {
 }

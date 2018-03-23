@@ -1,29 +1,22 @@
 /// <reference types="pixi.js" />
 
 declare module PIXI {
-    import Layer = pixi_display.Layer;
     interface WebGLRenderer {
-        _activeLayer: Layer
+        _activeLayer: pixi_display.Layer
         _renderSessionId: number
         _lastDisplayOrder: number
         incDisplayOrder(): number
     }
     interface CanvasRenderer {
-        _activeLayer: Layer
+        _activeLayer: pixi_display.Layer
         _renderSessionId: number
         _lastDisplayOrder: number
         incDisplayOrder(): number
     }
 }
 
-module pixi_display {
-    import WebGLRenderer = PIXI.WebGLRenderer;
-    import CanvasRenderer = PIXI.CanvasRenderer;
-    import DisplayObject = PIXI.DisplayObject;
-    import Transform = PIXI.Transform;
-    import RenderTexture = PIXI.RenderTexture;
-
-    (Object as any).assign(WebGLRenderer.prototype, {
+namespace pixi_display {
+    (Object as any).assign(PIXI.WebGLRenderer.prototype, {
         _lastDisplayOrder: 0,
         _activeLayer: null,
 
@@ -31,9 +24,9 @@ module pixi_display {
             return ++this._lastDisplayOrder;
         },
 
-        _oldRender: WebGLRenderer.prototype.render,
+        _oldRender: PIXI.WebGLRenderer.prototype.render,
 
-        render(displayObject: DisplayObject, renderTexture?: RenderTexture, clear?: boolean, transform?: Transform, skipUpdateTransform?: boolean) {
+        render(displayObject: PIXI.DisplayObject, renderTexture?: PIXI.RenderTexture, clear?: boolean, transform?: PIXI.Transform, skipUpdateTransform?: boolean) {
             if (!renderTexture) {
                 this._lastDisplayOrder = 0;
             }
@@ -45,7 +38,7 @@ module pixi_display {
         }
     });
 
-    (Object as any).assign(CanvasRenderer.prototype, {
+    (Object as any).assign(PIXI.CanvasRenderer.prototype, {
         _lastDisplayOrder: 0,
         _activeLayer: null,
 
@@ -53,7 +46,7 @@ module pixi_display {
             return ++this._lastDisplayOrder;
         },
 
-        _oldRender: CanvasRenderer.prototype.render,
+        _oldRender: PIXI.CanvasRenderer.prototype.render,
 
         render(displayObject: PIXI.DisplayObject, renderTexture?: PIXI.RenderTexture, clear?: boolean, transform?: PIXI.Transform, skipUpdateTransform?: boolean) {
             if (!renderTexture) {
