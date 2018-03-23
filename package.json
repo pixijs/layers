@@ -1,54 +1,27 @@
 {
-  "_from": "pixi-layers",
-  "_id": "pixi-layers@0.1.6",
-  "_inBundle": false,
-  "_integrity": "sha512-p4iu80j+8uLNzciJ4UHLDOc3UNO3GyBRIEsw4E7c/Rv7/Lenscusrc0nICoafGBZ5bbn/oyzlxWOhXe+4wY5pw==",
-  "_location": "/pixi-layers",
-  "_phantomChildren": {},
-  "_requested": {
-    "type": "tag",
-    "registry": true,
-    "raw": "pixi-layers",
-    "name": "pixi-layers",
-    "escapedName": "pixi-layers",
-    "rawSpec": "",
-    "saveSpec": null,
-    "fetchSpec": "latest"
-  },
-  "_requiredBy": [
-    "#USER",
-    "/"
-  ],
-  "_resolved": "https://registry.npmjs.org/pixi-layers/-/pixi-layers-0.1.5.tgz",
-  "_shasum": "ce6007c40d632b9d775b236cc25e59b1226557e8",
-  "_spec": "pixi-layers",
-  "_where": "c:\\rep\\pixi\\pixi-lights",
-  "author": {
-    "name": "Ivan Popelyshev"
-  },
-  "bugs": {
-    "url": "https://github.com/pixijs/pixi-display/issues"
-  },
-  "bundleDependencies": false,
-  "contributors": [
-    {
-      "name": "Ivan Popelyshev",
-      "email": "ivan.popelyshev@gmail.com"
-    }
-  ],
-  "dependencies": {
-    "@types/pixi.js": "^4.5.6"
-  },
-  "deprecated": false,
+  "name": "pixi-layers",
+  "version": "0.1.6",
   "description": "Pixi.js plugin, allows to change rendering order of containers without changing the scene graph.",
-  "devDependencies": {
-    "del": "^2.2.0",
-    "jaguarjs-jsdoc": "^1.0.1",
-    "jsdoc": "^3.4.0",
-    "mkdirp": "^0.5.1",
-    "parallelshell": "^2.0.0",
-    "rimraf": "^2.5.3",
-    "typescript": "^2.0.3"
+  "author": "Ivan Popelyshev",
+  "contributors": [
+    "Ivan Popelyshev <ivan.popelyshev@gmail.com>"
+  ],
+  "main": "./bin/pixi-layers.js",
+  "types": "./bin/pixi-layers.d.ts",
+  "homepage": "http://www.pixijs.com/",
+  "bugs": "https://github.com/pixijs/pixi-display/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pixijs/pixi-display.git"
+  },
+  "scripts": {
+    "clean": "rimraf bin && mkdirp bin",
+    "prestart": "npm run clean",
+    "start": "parallelshell \"npm run watch\"",
+    "watch": "tsc -w",
+    "prebuild": "npm run clean",
+    "build": "tsc"
   },
   "files": [
     "bin/",
@@ -59,22 +32,16 @@
     "tsconfig.json",
     "README.md"
   ],
-  "homepage": "http://www.pixijs.com/",
-  "license": "MIT",
-  "main": "./bin/pixi-layers.js",
-  "name": "pixi-layers",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/pixijs/pixi-display.git"
+  "devDependencies": {
+    "del": "^2.2.0",
+    "jaguarjs-jsdoc": "^1.0.1",
+    "jsdoc": "^3.4.0",
+    "mkdirp": "^0.5.1",
+    "parallelshell": "^2.0.0",
+    "rimraf": "^2.5.3",
+    "typescript": "^2.0.3"
   },
-  "scripts": {
-    "build": "tsc",
-    "clean": "rimraf bin && mkdirp bin",
-    "prebuild": "npm run clean",
-    "prestart": "npm run clean",
-    "start": "parallelshell \"npm run watch\"",
-    "watch": "tsc -w"
-  },
-  "types": "./bin/pixi-layers.d.ts",
-  "version": "0.1.5"
+  "dependencies": {
+    "@types/pixi.js": "^4.5.6"
+  }
 }
