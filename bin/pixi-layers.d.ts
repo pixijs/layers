@@ -29,6 +29,8 @@ declare module pixi_display {
         _activeStage: Stage;
         _activeChildren: Array<DisplayObject>;
         _lastUpdateId: number;
+        useRenderTexture: boolean;
+        clearColor: ArrayLike<number>;
         canDrawWithoutLayer: boolean;
         canDrawInParentStage: boolean;
         zIndex: number;
@@ -65,16 +67,24 @@ declare module pixi_display {
         _activeStageParent: Stage;
         _sortedChildren: Array<DisplayObject>;
         _tempLayerParent: Layer;
+        _thisRenderTexture: PIXI.RenderTexture;
+        _tempRenderTarget: PIXI.RenderTarget;
         insertChildrenBeforeActive: boolean;
         insertChildrenAfterActive: boolean;
         beginWork(stage: Stage): void;
         endWork(): void;
+        useRenderTexture: boolean;
+        clearColor: ArrayLike<number>;
+        getRenderTexture(): PIXI.RenderTexture;
         updateDisplayLayers(): void;
         doSort(): void;
         _preRender(renderer: WebGLRenderer | CanvasRenderer): boolean;
         _postRender(renderer: WebGLRenderer | CanvasRenderer): void;
+        _pushTexture(renderer: WebGLRenderer): void;
+        _popTexture(renderer: WebGLRenderer): void;
         renderWebGL(renderer: WebGLRenderer): void;
         renderCanvas(renderer: CanvasRenderer): void;
+        destroy(options: any): void;
     }
 }
 declare module PIXI {
