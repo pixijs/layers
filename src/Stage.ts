@@ -49,13 +49,13 @@ module pixi_display {
                 return;
             }
 
-            if ((displayObject as Layer).isLayer) {
-                const layer = displayObject as Layer;
+            if ((displayObject as any).isLayer) {
+                const layer = displayObject as any as Layer;
                 this._activeLayers.push(layer);
                 layer.beginWork(this);
             }
 
-            if (displayObject != this && (displayObject as Stage).isStage) {
+            if (displayObject != this && (displayObject as any).isStage) {
                 const stage = displayObject as Stage;
                 stage.updateAsChildStage(this);
                 return;

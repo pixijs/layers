@@ -28,6 +28,9 @@ module pixi_display {
 
         _lastUpdateId = -1;
 
+        useRenderTexture: boolean = false;
+        clearColor : ArrayLike<number> = new Float32Array([0, 0, 0, 1]);
+
         //TODO: handle orphan groups
         //TODO: handle groups that don't want to be drawn in parent
         canDrawWithoutLayer = false;
