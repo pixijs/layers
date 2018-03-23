@@ -178,6 +178,7 @@ module pixi_display {
 		}
 
 		_popTexture(renderer: WebGLRenderer) {
+			renderer.currentRenderer.flush();
 			renderer.bindRenderTarget(this._tempRenderTarget);
 			this._tempRenderTarget = null;
 		}
