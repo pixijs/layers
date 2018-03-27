@@ -1,6 +1,6 @@
 /// <reference types="pixi.js" />
 
-declare module PIXI {
+declare namespace PIXI {
     interface WebGLRenderer {
         _activeLayer: pixi_display.Layer
         _renderSessionId: number

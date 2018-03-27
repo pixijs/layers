@@ -1,4 +1,4 @@
-declare module PIXI {
+declare namespace PIXI {
     export interface Container {
         containerRenderWebGL(renderer: WebGLRenderer): void;
         containerRenderCanvas(renderer: CanvasRenderer): void;

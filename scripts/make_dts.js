@@ -27,7 +27,7 @@ tmp.file(function (err, filename) {
 
     fs.writeFileSync(
       path.resolve('dist/pixi-layers.d.ts'),
-      dtsContent.replace(/namespace pixi_display/g, 'module PIXI.display')
+      dtsContent.replace(/namespace pixi_display/g, 'namespace PIXI.display')
 		  .replace(/pixi_display/g, 'PIXI.display')
     );
   });

@@ -1,4 +1,4 @@
-declare module PIXI {
+declare namespace PIXI {
     export interface DisplayObject {
         parentGroup: pixi_display.Group,
 
