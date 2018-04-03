@@ -1,7 +1,6 @@
 namespace pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
-    import DestroyOptions = PIXI.DestroyOptions;
     /**
      * Container for layers
      *
@@ -33,7 +32,7 @@ namespace pixi_display {
             this._tempGroups.length = 0;
         }
 
-        destroy(options?: DestroyOptions | boolean) {
+        destroy(options?: any) {
             this.clear();
             super.destroy(options);
         }

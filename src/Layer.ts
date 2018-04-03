@@ -3,6 +3,109 @@
  */
 
 namespace pixi_display {
+	export class LayerTextureCache {
+		constructor(public layer: Layer) {
+		}
+
+		renderTexture: PIXI.RenderTexture = null;
+		doubleBuffer: Array<PIXI.RenderTexture> = null;
+		currentBufferIndex = 0;
+		_tempRenderTarget: PIXI.RenderTarget = null;
+
+		initRenderTexture(renderer?: PIXI.WebGLRenderer) {
+			const width = renderer ? renderer.screen.width : 100;
+			const height = renderer ? renderer.screen.height : 100;
+			const resolution = renderer ? renderer.resolution : PIXI.settings.RESOLUTION;
+
+			this.renderTexture = PIXI.RenderTexture.create(width, height, resolution);
+
+			if (this.layer.group.useDoubleBuffer) {
+				this.doubleBuffer = [
+					PIXI.RenderTexture.create(width, height, resolution),
+					PIXI.RenderTexture.create(width, height, resolution)
+				];
+			}
+		}
+
+		getRenderTexture() {
+			if (!this.renderTexture) {
+				this.initRenderTexture();
+			}
+			return this.renderTexture;
+		}
+
+		pushTexture(renderer: PIXI.WebGLRenderer) {
+			const screen = renderer.screen;
+
+			if (!this.renderTexture) {
+				this.initRenderTexture(renderer);
+			}
+
+			const rt = this.renderTexture;
+			const group = this.layer.group;
+			const db = this.doubleBuffer;
+
+			if (rt.width !== screen.width ||
+				rt.height !== screen.height ||
+				rt.baseTexture.resolution !== renderer.resolution) {
+				rt.baseTexture.resolution = renderer.resolution;
+				rt.resize(screen.width, screen.height);
+
+				if (db) {
+					db[0].baseTexture.resolution = renderer.resolution;
+					db[0].resize(screen.width, screen.height);
+					db[1].baseTexture.resolution = renderer.resolution;
+					db[1].resize(screen.width, screen.height);
+				}
+			}
+
+			this._tempRenderTarget = renderer._activeRenderTarget;
+
+			renderer.currentRenderer.flush();
+
+			if (group.useDoubleBuffer) {
+				// double-buffer logic
+				let buffer = db[this.currentBufferIndex];
+				if (!(buffer.baseTexture as any)._glTextures[renderer.CONTEXT_UID]) {
+					renderer.bindRenderTexture(buffer, null);
+					if (group.clearColor) {
+						renderer.clear(group.clearColor as any);
+					}
+				}
+				renderer.unbindTexture(rt);
+				(rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;
+				(rt.baseTexture as any)._glRenderTargets = (buffer.baseTexture as any)._glRenderTargets;
+
+				this.currentBufferIndex = 1 - this.currentBufferIndex;
+				buffer = db[this.currentBufferIndex]
+				renderer.bindRenderTexture(buffer, null);
+			} else {
+				// simple logic
+				renderer.bindRenderTexture(rt, undefined);
+			}
+
+			if (group.clearColor) {
+				renderer.clear(group.clearColor as any);
+			}
+		}
+
+		popTexture(renderer: PIXI.WebGLRenderer) {
+			renderer.currentRenderer.flush();
+			renderer.bindRenderTarget(this._tempRenderTarget);
+			this._tempRenderTarget = null;
+		}
+
+		destroy() {
+			if (this.renderTexture) {
+				this.renderTexture.destroy();
+				if (this.doubleBuffer) {
+					this.doubleBuffer[0].destroy(true);
+					this.doubleBuffer[1].destroy(true);
+				}
+			}
+		}
+	}
+
 	export class Layer extends PIXI.Container {
 		constructor(group: Group = null) {
 			super();
@@ -22,9 +125,8 @@ namespace pixi_display {
 		_activeStageParent: Stage = null;
 		_sortedChildren: Array<PIXI.DisplayObject> = [];
 		_tempLayerParent: Layer = null;
-		_thisRenderTexture: PIXI.RenderTexture = null;
-		_tempRenderTarget: PIXI.RenderTarget = null;
 
+		textureCache: LayerTextureCache;
 		insertChildrenBeforeActive = true;
 		insertChildrenAfterActive = true;
 
@@ -79,6 +181,14 @@ namespace pixi_display {
 			this.group.useRenderTexture = value;
 		}
 
+		get useDoubleBuffer() {
+			return this.group.useDoubleBuffer;
+		}
+
+		set useDoubleBuffer(value: boolean) {
+			this.group.useDoubleBuffer = value;
+		}
+
 		get clearColor() {
 			return this.group.clearColor;
 		}
@@ -88,10 +198,10 @@ namespace pixi_display {
 		}
 
 		getRenderTexture() {
-			if (!this._thisRenderTexture) {
-				this._thisRenderTexture = PIXI.RenderTexture.create(100, 100);
+			if (!this.textureCache) {
+				this.textureCache = new LayerTextureCache(this);
 			}
-			return this._thisRenderTexture;
+			return this.textureCache.getRenderTexture();
 		}
 
 		updateDisplayLayers() {
@@ -147,51 +257,23 @@ namespace pixi_display {
 			this._tempLayerParent = null;
 		}
 
-		_pushTexture(renderer: PIXI.WebGLRenderer) {
-			const screen = renderer.screen;
-
-			if (!this._thisRenderTexture) {
-				this._thisRenderTexture = PIXI.RenderTexture.create(screen.width, screen.height, null, renderer.resolution);
-			}
-
-			const rt = this._thisRenderTexture;
-
-			if (rt.width !== screen.width ||
-				rt.height !== screen.height ||
-				rt.baseTexture.resolution !== renderer.resolution) {
-				rt.baseTexture.resolution = renderer.resolution;
-				rt.resize(screen.width, screen.height);
-			}
-
-			this._tempRenderTarget = renderer._activeRenderTarget;
-
-			renderer.currentRenderer.flush();
-			renderer.bindRenderTexture(rt, undefined);
-			if (this.group.clearColor) {
-				renderer.clear(this.group.clearColor as any);
-			}
-		}
-
-		_popTexture(renderer: PIXI.WebGLRenderer) {
-			renderer.currentRenderer.flush();
-			renderer.bindRenderTarget(this._tempRenderTarget);
-			this._tempRenderTarget = null;
-		}
-
 		renderWebGL(renderer: PIXI.WebGLRenderer) {
 			if (!this._preRender(renderer)) {
 				return;
 			}
 
 			if (this.group.useRenderTexture) {
-				this._pushTexture(renderer);
+				if (!this.textureCache) {
+					this.textureCache = new LayerTextureCache(this);
+				}
+				this.textureCache.pushTexture(renderer);
 			}
 
 			this.containerRenderWebGL(renderer);
 			this._postRender(renderer);
 
 			if (this.group.useRenderTexture) {
-				this._popTexture(renderer);
+				this.textureCache.popTexture(renderer);
 			}
 		}
 
@@ -203,8 +285,9 @@ namespace pixi_display {
 		}
 
 		destroy(options?: any) {
-			if (this._thisRenderTexture) {
-				this._thisRenderTexture.destroy(true);
+			if (this.textureCache) {
+				this.textureCache.destroy();
+				this.textureCache = null;
 			}
 			super.destroy(options);
 		}
