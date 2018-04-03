@@ -7,13 +7,15 @@ Compiled files are located in "dist" folder
 
 Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
 
-### Example
+### Examples
 
 [Lighting example](http://pixijs.github.io/examples/#/layers/lighting.js)
 
 [Z-order example](http://pixijs.github.io/examples/#/layers/zorder.js)
 
 [Normals example](http://pixijs.github.io/examples/#/layers/normals.js)
+
+[Normals with sorting](http://pixijs.github.io/examples/#/layers/normals.js)
 
 ### Compatibility
 
@@ -89,6 +91,15 @@ var lightLayer = new PIXI.display.Layer(lightGroup); // only one layer per stage
 ```
 
 Groups are working between different stages, so when you move bunny it will be rendered in its light layer.
+
+Layer is representation of global Group in this particular stage.
+
+### Advanced sorting
+
+If you want sorting to affect children that have different parentLayer than their direct parent,
+please set the group `sortPriority`. For now, it has two values - 0 by default and 1 for special cases.
+
+Look at [Normals with sorting](http://pixijs.github.io/examples/#/layers/normals.js)
 
 ### The legend
 

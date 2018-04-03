@@ -30,6 +30,7 @@ namespace pixi_display {
 
         useRenderTexture: boolean = false;
         useDoubleBuffer: boolean = false;
+        sortPriority: number = 0;
         clearColor : ArrayLike<number> = new Float32Array([0, 0, 0, 0]);
 
         //TODO: handle orphan groups

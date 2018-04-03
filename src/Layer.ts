@@ -197,12 +197,12 @@ namespace pixi_display {
             this.group.clearColor = value;
         }
 
-        get layerChildrenAfterSort() {
-            return this.group.layerChildrenAfterSort;
+        get sortPriority() {
+            return this.group.sortPriority;
         }
 
-        set layerChildrenAfterSort(value: boolean) {
-            this.group.layerChildrenAfterSort = value;
+        set sortPriority(value: number) {
+            this.group.sortPriority = value;
         }
 
         getRenderTexture() {

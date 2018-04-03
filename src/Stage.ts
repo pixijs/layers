@@ -1,6 +1,7 @@
 namespace pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Container = PIXI.Container;
+
     /**
      * Container for layers
      *
@@ -59,20 +60,36 @@ namespace pixi_display {
                 return;
             }
 
-            const group = displayObject.parentGroup;
-            if (group != null) {
-                displayObject.parentGroup.addDisplayObject(this, displayObject);
+            let group = displayObject.parentGroup;
+            if (group !== null) {
+                group.addDisplayObject(this, displayObject);
             }
             const layer = displayObject.parentLayer;
-            if (layer != null) {
-                layer.group.addDisplayObject(this, displayObject);
+            if (layer !== null) {
+                group = layer.group;
+                group.addDisplayObject(this, displayObject);
             }
 
             displayObject.updateOrder = ++Stage._updateOrderCounter;
-            if (displayObject.alpha <= 0 || !displayObject.renderable || !displayObject.layerableChildren) {
+            if (displayObject.alpha <= 0 || !displayObject.renderable
+                || !displayObject.layerableChildren
+                || group && group.sortPriority) {
                 return;
             }
 
+            const children = (displayObject as Container).children;
+            if (children && children.length) {
+                for (let i = 0; i < children.length; i++) {
+                    this._addRecursive(children[i]);
+                }
+            }
+        }
+
+        _addRecursiveChildren(displayObject: DisplayObject) {
+            if (displayObject.alpha <= 0 || !displayObject.renderable
+                || !displayObject.layerableChildren) {
+                return;
+            }
             const children = (displayObject as Container).children;
             if (children && children.length) {
                 for (let i = 0; i < children.length; i++) {
@@ -85,8 +102,23 @@ namespace pixi_display {
             this.clear();
             this._addRecursive(this);
             const layers = this._activeLayers;
+
             for (let i = 0; i < layers.length; i++) {
-                layers[i].endWork();
+                const layer = layers[i];
+                if (layer.group.sortPriority) {
+                    layer.endWork();
+                    const sorted = layer._sortedChildren;
+                    for (let j = 0; j < sorted.length; j++) {
+                        this._addRecursiveChildren(sorted[j]);
+                    }
+                }
+            }
+
+            for (let i = 0; i < layers.length; i++) {
+                const layer = layers[i];
+                if (!layer.group.sortPriority) {
+                    layer.endWork();
+                }
             }
         }
 
