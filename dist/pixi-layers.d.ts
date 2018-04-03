@@ -1,13 +1,13 @@
 /// <reference types="pixi.js" />
-declare module PIXI {
+declare namespace PIXI {
     interface Container {
         containerRenderWebGL(renderer: WebGLRenderer): void;
         containerRenderCanvas(renderer: CanvasRenderer): void;
     }
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
 }
-declare module PIXI {
+declare namespace PIXI {
     interface DisplayObject {
         parentGroup: PIXI.display.Group;
         parentLayer: PIXI.display.Layer;
@@ -19,7 +19,7 @@ declare module PIXI {
         layerableChildren: boolean;
     }
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
     import DisplayObject = PIXI.DisplayObject;
     import utils = PIXI.utils;
     class Group extends utils.EventEmitter {
@@ -30,6 +30,7 @@ declare module PIXI.display {
         _activeChildren: Array<DisplayObject>;
         _lastUpdateId: number;
         useRenderTexture: boolean;
+        useDoubleBuffer: boolean;
         clearColor: ArrayLike<number>;
         canDrawWithoutLayer: boolean;
         canDrawInParentStage: boolean;
@@ -51,9 +52,22 @@ declare module PIXI.display {
         static conflict(): void;
     }
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
+    class LayerTextureCache {
+        layer: Layer;
+        constructor(layer: Layer);
+        renderTexture: PIXI.RenderTexture;
+        doubleBuffer: Array<PIXI.RenderTexture>;
+        currentBufferIndex: number;
+        _tempRenderTarget: PIXI.RenderTarget;
+        initRenderTexture(renderer?: PIXI.WebGLRenderer): void;
+        getRenderTexture(): PIXI.RenderTexture;
+        pushTexture(renderer: PIXI.WebGLRenderer): void;
+        popTexture(renderer: PIXI.WebGLRenderer): void;
+        destroy(): void;
+    }
     class Layer extends PIXI.Container {
         constructor(group?: Group);
         isLayer: boolean;
@@ -63,27 +77,25 @@ declare module PIXI.display {
         _activeStageParent: Stage;
         _sortedChildren: Array<PIXI.DisplayObject>;
         _tempLayerParent: Layer;
-        _thisRenderTexture: PIXI.RenderTexture;
-        _tempRenderTarget: PIXI.RenderTarget;
+        textureCache: LayerTextureCache;
         insertChildrenBeforeActive: boolean;
         insertChildrenAfterActive: boolean;
         beginWork(stage: Stage): void;
         endWork(): void;
         useRenderTexture: boolean;
+        useDoubleBuffer: boolean;
         clearColor: ArrayLike<number>;
         getRenderTexture(): PIXI.RenderTexture;
         updateDisplayLayers(): void;
         doSort(): void;
         _preRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): boolean;
         _postRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): void;
-        _pushTexture(renderer: PIXI.WebGLRenderer): void;
-        _popTexture(renderer: PIXI.WebGLRenderer): void;
         renderWebGL(renderer: PIXI.WebGLRenderer): void;
         renderCanvas(renderer: PIXI.CanvasRenderer): void;
         destroy(options?: any): void;
     }
 }
-declare module PIXI {
+declare namespace PIXI {
     interface WebGLRenderer {
         _activeLayer: PIXI.display.Layer;
         _renderSessionId: number;
@@ -97,11 +109,10 @@ declare module PIXI {
         incDisplayOrder(): number;
     }
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
     import DisplayObject = PIXI.DisplayObject;
-    import DestroyOptions = PIXI.DestroyOptions;
     class Stage extends Layer {
         constructor();
         static _updateOrderCounter: number;
@@ -110,12 +121,15 @@ declare module PIXI.display {
         _activeLayers: Array<Layer>;
         _activeParentStage: Stage;
         clear(): void;
-        destroy(options?: DestroyOptions | boolean): void;
+        destroy(options?: any): void;
         _addRecursive(displayObject: DisplayObject): void;
         _updateStageInner(): void;
         updateAsChildStage(stage: Stage): void;
         updateStage(): void;
     }
 }
-declare module PIXI.display {
+declare namespace PIXI.display {
+}
+declare module "pixi-layers" {
+    export = PIXI.display;
 }
