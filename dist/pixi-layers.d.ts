@@ -31,6 +31,7 @@ declare namespace PIXI.display {
         _lastUpdateId: number;
         useRenderTexture: boolean;
         useDoubleBuffer: boolean;
+        sortPriority: number;
         clearColor: ArrayLike<number>;
         canDrawWithoutLayer: boolean;
         canDrawInParentStage: boolean;
@@ -85,6 +86,7 @@ declare namespace PIXI.display {
         useRenderTexture: boolean;
         useDoubleBuffer: boolean;
         clearColor: ArrayLike<number>;
+        sortPriority: number;
         getRenderTexture(): PIXI.RenderTexture;
         updateDisplayLayers(): void;
         doSort(): void;
@@ -123,6 +125,7 @@ declare namespace PIXI.display {
         clear(): void;
         destroy(options?: any): void;
         _addRecursive(displayObject: DisplayObject): void;
+        _addRecursiveChildren(displayObject: DisplayObject): void;
         _updateStageInner(): void;
         updateAsChildStage(stage: Stage): void;
         updateStage(): void;
