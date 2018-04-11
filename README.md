@@ -7,6 +7,8 @@ Compiled files are located in "dist" folder
 
 Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
 
+**Nothing will work if you dont create Stage and set it as root. Please do it or read full explanation.**
+
 ### Examples
 
 [Lighting example](http://pixijs.github.io/examples/#/layers/lighting.js)
