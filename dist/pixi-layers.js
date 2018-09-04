@@ -610,7 +610,7 @@ var pixi_display;
                 return;
             }
             var group = displayObject.parentGroup;
-            if (group !== null) {
+            if (group != null) {
                 group.addDisplayObject(this, displayObject);
             }
             var layer = displayObject.parentLayer;
