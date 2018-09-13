@@ -151,7 +151,7 @@ namespace pixi_display {
                 if (order > this._eventDisplayOrder) {
                     this._eventDisplayOrder = order;
                     let q = queue[1];
-                    for (let i = 0; i < q.length; i++) {
+                    for (let i = 0, l = q.length; i < l; i++) {
                         queue[0].push(q[i]);
                     }
                     queue[1].length = 0;
@@ -162,8 +162,7 @@ namespace pixi_display {
         _finishInteractionProcess: function (event: InteractionEvent, func: Function) {
             let queue = this._queue;
             let q = queue[0];
-            let i = 0;
-            for (; i < q.length; i++) {
+            for (var i = 0, l = q.length; i < l; i++) {
                 if (event) {
                     //v4.3
                     if (func) {
@@ -175,7 +174,7 @@ namespace pixi_display {
                 }
             }
             q = queue[1];
-            for (i = 0; i < q.length; i++) {
+            for (var i = 0, l = q.length; i < l; i++) {
                 if (event) {
                     //v4.3
                     if (!event.target) {
