@@ -162,7 +162,7 @@ namespace pixi_display {
         _finishInteractionProcess: function (event: InteractionEvent, func: Function) {
             let queue = this._queue;
             let q = queue[0];
-            for (let i = 0, l = q.length; i < l; i++) {
+            for (var i = 0, l = q.length; i < l; i++) {
                 if (event) {
                     //v4.3
                     if (func) {
@@ -174,7 +174,7 @@ namespace pixi_display {
                 }
             }
             q = queue[1];
-            for (let i = 0, l = q.length; i < l; i++) {
+            for (var i = 0, l = q.length; i < l; i++) {
                 if (event) {
                     //v4.3
                     if (!event.target) {
