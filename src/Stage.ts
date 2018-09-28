@@ -61,9 +61,7 @@ namespace pixi_display {
             }
 
             let group = displayObject.parentGroup;
-            if (group !== null) {
-                group.addDisplayObject(this, displayObject);
-            }
+            group && group.addDisplayObject(this, displayObject);
             const layer = displayObject.parentLayer;
             if (layer !== null) {
                 group = layer.group;
