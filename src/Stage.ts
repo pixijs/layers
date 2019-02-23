@@ -60,12 +60,15 @@ namespace pixi_display {
                 return;
             }
 
+            // sometimes people put UNDEFINED in parentGroup or parentLayer
+            // that's why there is != instead of !==
+
             let group = displayObject.parentGroup;
-            if (group !== null) {
+            if (group != null) {
                 group.addDisplayObject(this, displayObject);
             }
             const layer = displayObject.parentLayer;
-            if (layer !== null) {
+            if (layer != null) {
                 group = layer.group;
                 group.addDisplayObject(this, displayObject);
             }

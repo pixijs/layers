@@ -17,12 +17,12 @@ namespace pixi_display {
             const height = renderer ? renderer.screen.height : 100;
             const resolution = renderer ? renderer.resolution : PIXI.settings.RESOLUTION;
 
-            this.renderTexture = PIXI.RenderTexture.create(width, height, resolution);
+            this.renderTexture = PIXI.RenderTexture.create(width, height, undefined, resolution);
 
             if (this.layer.group.useDoubleBuffer) {
                 this.doubleBuffer = [
-                    PIXI.RenderTexture.create(width, height, resolution),
-                    PIXI.RenderTexture.create(width, height, resolution)
+                    PIXI.RenderTexture.create(width, height, undefined, resolution),
+                    PIXI.RenderTexture.create(width, height, undefined, resolution)
                 ];
             }
         }
@@ -76,8 +76,7 @@ namespace pixi_display {
                 (rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;
                 (rt.baseTexture as any)._glRenderTargets = (buffer.baseTexture as any)._glRenderTargets;
 
-                this.currentBufferIndex = 1 - this.currentBufferIndex;
-                buffer = db[this.currentBufferIndex]
+                buffer = db[1 - this.currentBufferIndex];
                 renderer.bindRenderTexture(buffer, null);
             } else {
                 // simple logic
@@ -87,12 +86,35 @@ namespace pixi_display {
             if (group.clearColor) {
                 renderer.clear(group.clearColor as any);
             }
+
+            // fix for filters
+            const filterData = renderer.filterManager.filterData;
+            if (filterData) {
+                filterData.stack[filterData.index].renderTarget = renderer._activeRenderTarget;
+            }
         }
 
         popTexture(renderer: PIXI.WebGLRenderer) {
             renderer.currentRenderer.flush();
+            // switch filters back
+            const filterData = renderer.filterManager.filterData;
+            if (filterData) {
+                filterData.stack[filterData.index].renderTarget = this._tempRenderTarget;
+            }
             renderer.bindRenderTarget(this._tempRenderTarget);
             this._tempRenderTarget = null;
+
+	        const rt = this.renderTexture;
+	        const group = this.layer.group;
+	        const db = this.doubleBuffer;
+
+	        if (group.useDoubleBuffer) {
+		        renderer.unbindTexture(rt);
+		        this.currentBufferIndex = 1 - this.currentBufferIndex;
+		        let buffer = db[this.currentBufferIndex];
+		        (rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;
+		        (rt.baseTexture as any)._glRenderTargets = (buffer.baseTexture as any)._glRenderTargets;
+	        }
         }
 
         destroy() {

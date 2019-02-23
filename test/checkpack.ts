@@ -1,5 +1,5 @@
 import 'pixi.js';
-import '../dist/pixi-layers.js';
+import {Stage, Layer} from '../dist/pixi-layers.js';
 
 //@../node_modules/pixi.js/dist/pixi.min.js
 //@../dist/pixi-layers.js
@@ -10,7 +10,7 @@ var app = new PIXI.Application(WIDTH, HEIGHT);
 document.body.appendChild(app.view);
 
 //create the stage instead of container
-app.stage = new PIXI.display.Stage();
+app.stage = new Stage();
 
 var background = new PIXI.extras.TilingSprite(
 	PIXI.Texture.fromImage('http://pixijs.io/examples/required/assets/p2.jpeg'),
@@ -21,7 +21,7 @@ app.stage.addChild(background);
 var bunnyWorld = new PIXI.Container();
 app.stage.addChild(bunnyWorld);
 
-var lighting = new PIXI.display.Layer();
+var lighting = new Layer();
 lighting.on('display', function (element: any) {
 	element.blendMode = PIXI.BLEND_MODES.ADD
 });

@@ -24,7 +24,9 @@ namespace pixi_display {
                 return;
             }
 
+	        renderer._activeLayer = null;
             this.containerRenderWebGL(renderer);
+	        renderer._activeLayer = this._activeParentLayer;
         },
         renderCanvas: function (renderer: PIXI.CanvasRenderer): void {
             if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
@@ -43,7 +45,9 @@ namespace pixi_display {
                 return;
             }
 
+	        renderer._activeLayer = null;
             this.containerRenderCanvas(renderer);
+	        renderer._activeLayer = this._activeParentLayer;
         },
         containerRenderWebGL: PIXI.Container.prototype.renderWebGL,
         containerRenderCanvas: PIXI.Container.prototype.renderCanvas
