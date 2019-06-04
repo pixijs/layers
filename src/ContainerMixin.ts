@@ -1,13 +1,12 @@
 declare namespace PIXI {
     export interface Container {
-        containerRenderWebGL(renderer: WebGLRenderer): void;
-        containerRenderCanvas(renderer: CanvasRenderer): void;
+        containerRenderWebGL?(renderer: Renderer): void;
     }
 }
 
 namespace pixi_display {
     (Object as any).assign(PIXI.Container.prototype, {
-        renderWebGL: function (renderer: PIXI.WebGLRenderer): void {
+        render: function (renderer: PIXI.Renderer): void {
             if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
                 return;
             }
@@ -49,7 +48,7 @@ namespace pixi_display {
             this.containerRenderCanvas(renderer);
 	        renderer._activeLayer = this._activeParentLayer;
         },
-        containerRenderWebGL: PIXI.Container.prototype.renderWebGL,
-        containerRenderCanvas: PIXI.Container.prototype.renderCanvas
+        containerRenderWebGL: PIXI.Container.prototype.render,
+        containerRenderCanvas: (PIXI.Container as any).prototype.renderCanvas
     });
 }

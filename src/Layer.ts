@@ -10,19 +10,20 @@ namespace pixi_display {
         renderTexture: PIXI.RenderTexture = null;
         doubleBuffer: Array<PIXI.RenderTexture> = null;
         currentBufferIndex = 0;
-        _tempRenderTarget: PIXI.RenderTarget = null;
+        _tempRenderTarget: PIXI.RenderTexture = null;
+        _tempRenderTargetSource = new PIXI.Rectangle();
 
-        initRenderTexture(renderer?: PIXI.WebGLRenderer) {
+        initRenderTexture(renderer?: PIXI.Renderer) {
             const width = renderer ? renderer.screen.width : 100;
             const height = renderer ? renderer.screen.height : 100;
             const resolution = renderer ? renderer.resolution : PIXI.settings.RESOLUTION;
 
-            this.renderTexture = PIXI.RenderTexture.create(width, height, undefined, resolution);
+            this.renderTexture = PIXI.RenderTexture.create({width, height, resolution});
 
             if (this.layer.group.useDoubleBuffer) {
                 this.doubleBuffer = [
-                    PIXI.RenderTexture.create(width, height, undefined, resolution),
-                    PIXI.RenderTexture.create(width, height, undefined, resolution)
+                    PIXI.RenderTexture.create({width, height, resolution}),
+                    PIXI.RenderTexture.create({width, height, resolution})
                 ];
             }
         }
@@ -34,7 +35,7 @@ namespace pixi_display {
             return this.renderTexture;
         }
 
-        pushTexture(renderer: PIXI.WebGLRenderer) {
+        pushTexture(renderer: PIXI.Renderer) {
             const screen = renderer.screen;
 
             if (!this.renderTexture) {
@@ -59,49 +60,51 @@ namespace pixi_display {
                 }
             }
 
-            this._tempRenderTarget = renderer._activeRenderTarget;
+            this._tempRenderTarget = renderer.renderTexture.current;
+            this._tempRenderTargetSource.copyFrom(renderer.renderTexture.sourceFrame);
 
-            renderer.currentRenderer.flush();
+            renderer.batch.flush();
 
             if (group.useDoubleBuffer) {
                 // double-buffer logic
                 let buffer = db[this.currentBufferIndex];
                 if (!(buffer.baseTexture as any)._glTextures[renderer.CONTEXT_UID]) {
-                    renderer.bindRenderTexture(buffer, null);
+                    renderer.renderTexture.bind(buffer, undefined, undefined);
+                    renderer.texture.bind(buffer);
                     if (group.clearColor) {
-                        renderer.clear(group.clearColor as any);
+                        renderer.renderTexture.clear(group.clearColor as any);
                     }
                 }
-                renderer.unbindTexture(rt);
+                renderer.texture.unbind(rt);
                 (rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;
-                (rt.baseTexture as any)._glRenderTargets = (buffer.baseTexture as any)._glRenderTargets;
+                (rt.baseTexture as any).framebuffer = (buffer.baseTexture as any).framebuffer;
 
                 buffer = db[1 - this.currentBufferIndex];
-                renderer.bindRenderTexture(buffer, null);
+                renderer.renderTexture.bind(buffer, undefined, undefined);
             } else {
                 // simple logic
-                renderer.bindRenderTexture(rt, undefined);
+                renderer.renderTexture.bind(rt, undefined, undefined);
             }
 
             if (group.clearColor) {
-                renderer.clear(group.clearColor as any);
+                renderer.renderTexture.clear(group.clearColor as any);
             }
 
             // fix for filters
-            const filterData = renderer.filterManager.filterData;
-            if (filterData) {
-                filterData.stack[filterData.index].renderTarget = renderer._activeRenderTarget;
+            const filterStack = renderer.filter.defaultFilterStack;
+            if (filterStack.length > 1) {
+                filterStack[filterStack.length - 1].renderTexture = renderer.renderTexture.current;
             }
         }
 
-        popTexture(renderer: PIXI.WebGLRenderer) {
-            renderer.currentRenderer.flush();
+        popTexture(renderer: PIXI.Renderer) {
+            renderer.batch.flush();
             // switch filters back
-            const filterData = renderer.filterManager.filterData;
-            if (filterData) {
-                filterData.stack[filterData.index].renderTarget = this._tempRenderTarget;
+            const filterStack = renderer.filter.defaultFilterStack;
+            if (filterStack.length > 1) {
+                filterStack[filterStack.length - 1].renderTexture = this._tempRenderTarget;
             }
-            renderer.bindRenderTarget(this._tempRenderTarget);
+            renderer.renderTexture.bind(this._tempRenderTarget, this._tempRenderTargetSource, undefined);
             this._tempRenderTarget = null;
 
 	        const rt = this.renderTexture;
@@ -109,11 +112,11 @@ namespace pixi_display {
 	        const db = this.doubleBuffer;
 
 	        if (group.useDoubleBuffer) {
-		        renderer.unbindTexture(rt);
+		        renderer.texture.unbind(rt);
 		        this.currentBufferIndex = 1 - this.currentBufferIndex;
 		        let buffer = db[this.currentBufferIndex];
 		        (rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;
-		        (rt.baseTexture as any)._glRenderTargets = (buffer.baseTexture as any)._glRenderTargets;
+		        (rt.baseTexture as any).framebuffer = (buffer.baseTexture as any).framebuffer;
 	        }
         }
 
@@ -245,7 +248,7 @@ namespace pixi_display {
             this.group.doSort(this, this._sortedChildren);
         }
 
-        _preRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): boolean {
+        _preRender(renderer: PIXI.Renderer): boolean {
             if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
                 return false;
             }
@@ -273,21 +276,21 @@ namespace pixi_display {
             //just a temporary feature - getBounds() for filters will work with that
             //TODO: make a better hack for getBounds()
 
-            this._boundsID++;
-            this.children = this._sortedChildren;
+            (this as any)._boundsID++;
+            (this as any).children = this._sortedChildren;
 
             this._tempLayerParent = renderer._activeLayer;
             renderer._activeLayer = this;
             return true;
         }
 
-        _postRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer) {
-            this.children = this._tempChildren;
+        _postRender(renderer: PIXI.Renderer) {
+            (this as any).children = this._tempChildren;
             renderer._activeLayer = this._tempLayerParent;
             this._tempLayerParent = null;
         }
 
-        renderWebGL(renderer: PIXI.WebGLRenderer) {
+        render(renderer: PIXI.Renderer) {
             if (!this._preRender(renderer)) {
                 return;
             }
@@ -307,19 +310,19 @@ namespace pixi_display {
             }
         }
 
-        renderCanvas(renderer: PIXI.CanvasRenderer) {
-            if (this._preRender(renderer)) {
-                this.containerRenderCanvas(renderer);
-                this._postRender(renderer);
-            }
-        }
-
         destroy(options?: any) {
             if (this.textureCache) {
                 this.textureCache.destroy();
                 this.textureCache = null;
             }
             super.destroy(options);
+        }
+    }
+
+    (LayerTextureCache.prototype as any).renderCanvas = function(renderer: PIXI.CanvasRenderer) {
+        if (this._preRender(renderer)) {
+            this.containerRenderCanvas(renderer);
+            this._postRender(renderer);
         }
     }
 }

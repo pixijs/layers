@@ -63,7 +63,7 @@ namespace pixi_display {
             // (such as a game scene!) set interactiveChildren to false for that displayObject.
             // This will allow pixi to completely ignore and bypass checking the displayObjects children.
             const children: Array<DisplayObject> = (displayObject as Container).children;
-            if (displayObject.interactiveChildren && children) {
+            if ((displayObject as Container).interactiveChildren && children) {
                 for (let i = children.length - 1; i >= 0; i--) {
                     const child = children[i];
 

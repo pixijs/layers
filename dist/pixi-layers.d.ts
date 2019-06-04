@@ -1,8 +1,6 @@
-/// <reference types="pixi.js" />
 declare namespace PIXI {
     interface Container {
-        containerRenderWebGL(renderer: WebGLRenderer): void;
-        containerRenderCanvas(renderer: CanvasRenderer): void;
+        containerRenderWebGL?(renderer: Renderer): void;
     }
 }
 declare namespace PIXI.display {
@@ -10,13 +8,12 @@ declare namespace PIXI.display {
 declare namespace PIXI {
     interface DisplayObject {
         parentGroup: PIXI.display.Group;
-        parentLayer: PIXI.display.Layer;
-        _activeParentLayer: PIXI.display.Layer;
-        zOrder: number;
-        zIndex: number;
-        updateOrder: number;
-        displayOrder: number;
-        layerableChildren: boolean;
+        parentLayer?: PIXI.display.Layer;
+        _activeParentLayer?: PIXI.display.Layer;
+        zOrder?: number;
+        updateOrder?: number;
+        displayOrder?: number;
+        layerableChildren?: boolean;
     }
 }
 declare namespace PIXI.display {
@@ -24,7 +21,6 @@ declare namespace PIXI.display {
     import utils = PIXI.utils;
     class Group extends utils.EventEmitter {
         static _layerUpdateId: number;
-        computedChildren: Array<DisplayObject>;
         _activeLayer: Layer;
         _activeStage: Stage;
         _activeChildren: Array<DisplayObject>;
@@ -62,11 +58,12 @@ declare namespace PIXI.display {
         renderTexture: PIXI.RenderTexture;
         doubleBuffer: Array<PIXI.RenderTexture>;
         currentBufferIndex: number;
-        _tempRenderTarget: PIXI.RenderTarget;
-        initRenderTexture(renderer?: PIXI.WebGLRenderer): void;
+        _tempRenderTarget: PIXI.RenderTexture;
+        _tempRenderTargetSource: PIXI.Rectangle;
+        initRenderTexture(renderer?: PIXI.Renderer): void;
         getRenderTexture(): PIXI.RenderTexture;
-        pushTexture(renderer: PIXI.WebGLRenderer): void;
-        popTexture(renderer: PIXI.WebGLRenderer): void;
+        pushTexture(renderer: PIXI.Renderer): void;
+        popTexture(renderer: PIXI.Renderer): void;
         destroy(): void;
     }
     class Layer extends PIXI.Container {
@@ -90,25 +87,25 @@ declare namespace PIXI.display {
         getRenderTexture(): PIXI.RenderTexture;
         updateDisplayLayers(): void;
         doSort(): void;
-        _preRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): boolean;
-        _postRender(renderer: PIXI.WebGLRenderer | PIXI.CanvasRenderer): void;
-        renderWebGL(renderer: PIXI.WebGLRenderer): void;
-        renderCanvas(renderer: PIXI.CanvasRenderer): void;
+        _preRender(renderer: PIXI.Renderer): boolean;
+        _postRender(renderer: PIXI.Renderer): void;
+        render(renderer: PIXI.Renderer): void;
         destroy(options?: any): void;
     }
 }
 declare namespace PIXI {
-    interface WebGLRenderer {
-        _activeLayer: PIXI.display.Layer;
-        _renderSessionId: number;
-        _lastDisplayOrder: number;
-        incDisplayOrder(): number;
+    interface Renderer {
+        _activeLayer?: PIXI.display.Layer;
+        _renderSessionId?: number;
+        _lastDisplayOrder?: number;
+        CONTEXT_UID?: number;
+        incDisplayOrder?(): number;
     }
     interface CanvasRenderer {
-        _activeLayer: PIXI.display.Layer;
-        _renderSessionId: number;
-        _lastDisplayOrder: number;
-        incDisplayOrder(): number;
+        _activeLayer?: PIXI.display.Layer;
+        _renderSessionId?: number;
+        _lastDisplayOrder?: number;
+        incDisplayOrder?(): number;
     }
 }
 declare namespace PIXI.display {

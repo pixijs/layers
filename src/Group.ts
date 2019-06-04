@@ -10,15 +10,10 @@
 
 namespace pixi_display {
     import DisplayObject = PIXI.DisplayObject;
-    import Container = PIXI.Container;
     import utils = PIXI.utils;
-    import WebGLRenderer = PIXI.WebGLRenderer;
-    import CanvasRenderer = PIXI.CanvasRenderer;
 
     export class Group extends utils.EventEmitter {
         static _layerUpdateId = 0;
-
-        computedChildren: Array<DisplayObject>;
 
         _activeLayer: Layer = null;
 
@@ -77,13 +72,10 @@ namespace pixi_display {
         }
 
         static compareZIndex(a: DisplayObject, b: DisplayObject) {
-            if (a.zIndex !== b.zIndex) {
-                return a.zIndex - b.zIndex;
-            }
-            if (a.zOrder > b.zOrder) {
+            if (a.zOrder < b.zOrder) {
                 return -1;
             }
-            if (a.zOrder < b.zOrder) {
+            if (a.zOrder > b.zOrder) {
                 return 1;
             }
             return a.updateOrder - b.updateOrder;

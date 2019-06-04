@@ -1,11 +1,11 @@
 # pixi-layers
 Allows to change rendering order of pixi containers without changing the scene graph
 
-Its new version of "pixi-display" API, it allows to combine reordering with filters and masks
+Works with PixiJS v5.
+
+For PixiJS v4 please use [layers branch](https://github.com/pixijs/pixi-display/tree/)
 
 Compiled files are located in "dist" folder
-
-Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
 
 **Nothing will work if you dont create Stage and set it as root. Please do it or read full explanation.**
 
@@ -15,15 +15,15 @@ Old version is in [master branch](https://github.com/pixijs/pixi-display/tree/)
 
 [Z-order example](http://pixijs.github.io/examples/#/layers/zorder.js)
 
-[Normals example](http://pixijs.github.io/examples/#/layers/normals.js)
+[Normals example - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
 
-[Normals with sorting](http://pixijs.github.io/examples/#/layers/normals.js)
+[Normals with sorting - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
 
 ### Compatibility
 
-Made for pixi-v4
+Made for pixi-v5
 
-Not compatible with v2, v3 and v5
+Not compatible with v2, v3 and v4
 
 ### Some explanations
 
@@ -39,13 +39,12 @@ Pixi DisplayObject/Container can be rendered inside its layer instead of direct 
 bunnySprite.parentLayer = layer;
 ```
 
-Layer can order elements inside of it, by zIndex increase and then by zOrder decrease
+Layer can order elements inside of it, by zOrder increase
 
 ```js
-bunnySprite.zIndex = 1;
-cloudSprite.zIndex = 2;
-badCloudSprite.zIndex = 2;
-badCloudSprite.zOrder = 1;
+bunnySprite.zOrder = 2;
+cloudSprite.zOrder = 1;
+badCloudSprite.zOrder = 1.01;
 layer.group.enableSort = true;
 ```
 
@@ -64,7 +63,7 @@ console.log(layer.displayChildren);
 updateStage calls onSort, you can override it
 
 ```js
-layer.group.on('sort', function(sprite) { sprite.zOrder = -sprite.y })
+layer.group.on('sort', function(sprite) { sprite.zOrder = sprite.y })
 ```
 
 Renderer will call "updateStage" automatically, so you can check it after render too
