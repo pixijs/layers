@@ -11,13 +11,15 @@ Compiled files are located in "dist" folder
 
 ### Examples
 
-[Lighting example](http://pixijs.github.io/examples/#/layers/lighting.js)
+[Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
 
-[Z-order example](http://pixijs.github.io/examples/#/layers/zorder.js)
+[Z-order example](https://pixijs.io/examples/#/plugin-layers/zorder.js)
 
 [Normals example - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
 
 [Normals with sorting - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
+
+[Double buffering - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/trail.js)
 
 ### Compatibility
 
