@@ -21,11 +21,36 @@ Compiled files are located in "dist" folder
 
 [Double buffering - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/trail.js)
 
-### Compatibility
+### Migration from v4
 
-Made for pixi-v5
+PixiJS v5 introduced zIndex sorting: 
 
-Not compatible with v2, v3 and v4
+```js
+child.zIndex = 1;
+container.sortableChildren = true;
+```
+
+Therefore, to avoid any conflicts, pixi-layers sorts only by zOrder, 
+and zOrder works same direction as zIndex. 
+
+That means if you used `zIndex = sprite.y` or `zOrder = -sprite.y` in v4, now you have to use `zOrder=sprite.y`.
+Or you can override group sorting function so it sorts like before.
+
+However, you can use a hack for compatibility with v4:
+```js
+PIXI.display.Group.compareZIndex = function (a, b) {
+   if (a.zIndex !== b.zIndex) {
+       return a.zIndex - b.zIndex;
+   }
+   if (a.zOrder > b.zOrder) {
+       return -1;
+   }
+   if (a.zOrder < b.zOrder) {
+       return 1;
+   }
+   return a.updateOrder - b.updateOrder;
+}
+```
 
 ### Some explanations
 
