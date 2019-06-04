@@ -3,7 +3,7 @@ Allows to change rendering order of pixi containers without changing the scene g
 
 Works with PixiJS v5.
 
-For PixiJS v4 please use [layers branch](https://github.com/pixijs/pixi-display/tree/)
+For PixiJS v4 please use [layers branch](https://github.com/pixijs/pixi-layers/tree/layers)
 
 Compiled files are located in "dist" folder
 
