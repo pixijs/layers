@@ -319,7 +319,7 @@ namespace pixi_display {
         }
     }
 
-    (LayerTextureCache.prototype as any).renderCanvas = function(renderer: PIXI.CanvasRenderer) {
+    (Layer.prototype as any).renderCanvas = function(renderer: PIXI.CanvasRenderer) {
         if (this._preRender(renderer)) {
             this.containerRenderCanvas(renderer);
             this._postRender(renderer);
