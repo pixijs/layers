@@ -122,6 +122,18 @@ Groups are working between different stages, so when you move bunny it will be r
 
 Layer is representation of global Group in this particular stage.
 
+### Webpack, browserify, Angular
+
+Its a bit tricky. You have to put this thing in one of your root files that are loaded before everything else!
+
+Make sure that you dont have two copies of pixiJS: one from html, one from browserify, it happens. You'll get strange errors like `renderer.incDisplayOrder is not a function` in that case.
+
+```
+import * as PIXI from "pixi.js';
+window.PIXI = PIXI;
+import "pixi-layers"; //or require("pixi-layers")
+```
+
 ### Advanced sorting
 
 If you want sorting to affect children that have different parentLayer than their direct parent,
