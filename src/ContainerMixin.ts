@@ -1,74 +1,54 @@
-import WebGLRenderer = PIXI.WebGLRenderer;
-import CanvasRenderer = PIXI.CanvasRenderer;
-declare module PIXI {
+declare namespace PIXI {
     export interface Container {
-        displayList: pixi_display.DisplayList;
-        displayChildren: Array<PIXI.DisplayObject>;
-        updateTransform(): void;
-        renderCanvas(renderer: CanvasRenderer): void;
-        renderWebGL(renderer: WebGLRenderer): void;
-        containerRenderWebGL(renderer: WebGLRenderer): void;
-        containerRenderCanvas(renderer: CanvasRenderer): void;
+        containerRenderWebGL?(renderer: Renderer): void;
     }
 }
 
-(Object as any).assign(PIXI.Container.prototype, {
-    displayList: null,
-    displayChildren: null,
-    displayParent: null,
-    updateTransform: function () {
-        if (!this.visible) {
-            return;
-        }
-        this.containerUpdateTransform();
-        if (this.displayList) {
-            this.displayList.update(this);
-        }
-    },
-    renderCanvas: function (renderer: CanvasRenderer) {
-        if (!this.visible) {
-            this.displayOrder = 0;
-            return;
-        }
+namespace pixi_display {
+    (Object as any).assign(PIXI.Container.prototype, {
+        render: function (renderer: PIXI.Renderer): void {
+            if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
+                return;
+            }
 
-        this.displayOrder = renderer.incDisplayOrder();
+            if (!this.visible) {
+                this.displayOrder = 0;
+                return;
+            }
 
-        // if the object is not visible or the alpha is 0 then no need to render this element
-        if (this.worldAlpha <= 0 || !this.renderable) {
-            return;
-        }
+            this.displayOrder = renderer.incDisplayOrder();
 
-        //hook for displayList
+            // if the object is not visible or the alpha is 0 then no need to render this element
+            if (this.worldAlpha <= 0 || !this.renderable) {
+                return;
+            }
 
-        if (this.displayList) {
-            this.displayList.renderCanvas(this, renderer);
-            return;
-        }
+	        renderer._activeLayer = null;
+            this.containerRenderWebGL(renderer);
+	        renderer._activeLayer = this._activeParentLayer;
+        },
+        renderCanvas: function (renderer: PIXI.CanvasRenderer): void {
+            if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
+                return;
+            }
 
-        this.containerRenderCanvas(renderer);
-    },
-    renderWebGL: function (renderer: WebGLRenderer) {
-        if (!this.visible) {
-            this.displayOrder = 0;
-            return;
-        }
+            if (!this.visible) {
+                this.displayOrder = 0;
+                return;
+            }
 
-        this.displayOrder = renderer.incDisplayOrder();
+            this.displayOrder = renderer.incDisplayOrder();
 
-        // if the object is not visible or the alpha is 0 then no need to render this element
-        if (this.worldAlpha <= 0 || !this.renderable) {
-            return;
-        }
+            // if the object is not visible or the alpha is 0 then no need to render this element
+            if (this.worldAlpha <= 0 || !this.renderable) {
+                return;
+            }
 
-        //hook for displayList
-
-        if (this.displayList) {
-            this.displayList.renderWebGL(this, renderer);
-            return;
-        }
-
-        this.containerRenderWebGL(renderer);
-    },
-    containerRenderWebGL: PIXI.Container.prototype.renderWebGL,
-    containerRenderCanvas: PIXI.Container.prototype.renderCanvas
-});
+	        renderer._activeLayer = null;
+            this.containerRenderCanvas(renderer);
+	        renderer._activeLayer = this._activeParentLayer;
+        },
+        containerRenderWebGL: PIXI.Container.prototype.render,
+        containerRenderCanvas: (PIXI.Container as any).prototype.renderCanvas
+    });
+}

@@ -1,11 +1,9 @@
-declare module PIXI {
-    var display: typeof pixi_display;
-    var DisplayGroup: typeof pixi_display.DisplayGroup;
-    var DisplayList: typeof pixi_display.DisplayList;
+/// <reference types="pixi.js" />
+
+namespace pixi_display {
+	(PIXI as any).display = pixi_display;
 }
 
-(Object as any).assign(PIXI, {
-    display: pixi_display,
-    DisplayGroup: pixi_display.DisplayGroup,
-    DisplayList: pixi_display.DisplayList
-});
+declare module "pixi-layers" {
+	export = pixi_display;
+}

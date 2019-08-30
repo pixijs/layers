@@ -4,7 +4,7 @@
  * @mixin
  */
 
-module pixi_display {
+namespace pixi_display {
     import InteractionManager = PIXI.interaction.InteractionManager;
     import DisplayObject = PIXI.DisplayObject;
     import Point = PIXI.Point;
@@ -16,7 +16,7 @@ module pixi_display {
         /**
          * This is private recursive copy of processInteractive
          */
-        _displayProcessInteractive: function (point: Point, displayObject: DisplayObject, hitTestOrder: number, interactive: boolean): number {
+        _displayProcessInteractive: function (point: Point, displayObject: DisplayObject, hitTestOrder: number, interactive: boolean, outOfMask: boolean): number {
             if (!displayObject || !displayObject.visible) {
                 return 0;
             }
@@ -32,7 +32,7 @@ module pixi_display {
             // As another little optimisation once an interactive object has been hit we can carry on through the scenegraph, but we know that there will be no more hits! So we can avoid extra hit tests
             // A final optimisation is that an object is not hit test directly if a child has already been hit.
 
-            var hit = 0,
+            let hit = 0,
                 interactiveParent = interactive = displayObject.interactive || interactive;
 
             // if the displayobject has a hitArea, then it does not need to hitTest children.
@@ -40,18 +40,22 @@ module pixi_display {
                 interactiveParent = false;
             }
 
+            if (displayObject._activeParentLayer) {
+                outOfMask = false;
+            }
+
             // it has a mask! Then lets hit test that before continuing..
             const mask: Graphics = (displayObject as any)._mask;
             if (hitTestOrder < Infinity && mask) {
                 if (!mask.containsPoint(point)) {
-                    hitTestOrder = Infinity;
+                    outOfMask = true;
                 }
             }
 
             // it has a filterArea! Same as mask but easier, its a rectangle
             if (hitTestOrder < Infinity && displayObject.filterArea) {
                 if (!displayObject.filterArea.contains(point.x, point.y)) {
-                    hitTestOrder = Infinity;
+                    outOfMask = true;
                 }
             }
 
@@ -59,12 +63,12 @@ module pixi_display {
             // (such as a game scene!) set interactiveChildren to false for that displayObject.
             // This will allow pixi to completely ignore and bypass checking the displayObjects children.
             const children: Array<DisplayObject> = (displayObject as Container).children;
-            if (displayObject.interactiveChildren && children) {
-                for (var i = children.length - 1; i >= 0; i--) {
+            if ((displayObject as Container).interactiveChildren && children) {
+                for (let i = children.length - 1; i >= 0; i--) {
                     const child = children[i];
 
                     // time to get recursive.. if this function will return if something is hit..
-                    const hitChild = this._displayProcessInteractive(point, child, hitTestOrder, interactiveParent);
+                    const hitChild = this._displayProcessInteractive(point, child, hitTestOrder, interactiveParent, outOfMask);
                     if (hitChild) {
                         // its a good idea to check if a child has lost its parent.
                         // this means it has been removed whilst looping so its best
@@ -80,25 +84,31 @@ module pixi_display {
 
             // no point running this if the item is not interactive or does not have an interactive parent.
             if (interactive) {
-                // if we are hit testing (as in we have no hit any objects yet)
-                // We also don't need to worry about hit testing if once of the displayObjects children has already been hit!
-                if (hitTestOrder < displayObject.displayOrder) {
-                    //pixi v4
-                    if (displayObject.hitArea) {
-                        displayObject.worldTransform.applyInverse(point, this._tempPoint);
-                        if (displayObject.hitArea.contains(this._tempPoint.x, this._tempPoint.y)) {
-                            hit = displayObject.displayOrder;
+                if (!outOfMask) {
+                    // if we are hit testing (as in we have no hit any objects yet)
+                    // We also don't need to worry about hit testing if once of the displayObjects children has already been hit!
+                    if (hitTestOrder < displayObject.displayOrder) {
+                        //pixi v4
+                        if (displayObject.hitArea) {
+                            displayObject.worldTransform.applyInverse(point, this._tempPoint);
+                            if (displayObject.hitArea.contains(this._tempPoint.x, this._tempPoint.y)) {
+                                hit = displayObject.displayOrder;
+                            }
+                        }
+                        else if ((displayObject as any).containsPoint) {
+                            if ((displayObject as any).containsPoint(point)) {
+                                hit = displayObject.displayOrder;
+                            }
                         }
                     }
-                    else if ((displayObject as any).containsPoint) {
-                        if ((displayObject as any).containsPoint(point)) {
-                            hit = displayObject.displayOrder;
-                        }
-                    }
-                }
 
-                if (displayObject.interactive) {
-                    this._queueAdd(displayObject, hit);
+                    if (displayObject.interactive) {
+                        this._queueAdd(displayObject, hit === Infinity ? 0 : hit);
+                    }
+                } else {
+                    if (displayObject.interactive) {
+                        this._queueAdd(displayObject, 0);
+                    }
                 }
             }
 
@@ -108,8 +118,8 @@ module pixi_display {
 
         processInteractive: function (strangeStuff: InteractionEvent | Point, displayObject: DisplayObject, func: Function, hitTest: boolean, interactive: boolean) {
             //older versions
-            var interactionEvent: InteractionEvent = null;
-            var point: Point = null;
+            let interactionEvent: InteractionEvent = null;
+            let point: Point = null;
             if ((strangeStuff as InteractionEvent).data &&
                 (strangeStuff as InteractionEvent).data.global) {
                 interactionEvent = strangeStuff as InteractionEvent;
@@ -134,14 +144,14 @@ module pixi_display {
         },
 
         _queueAdd: function (displayObject: DisplayObject, order: number) {
-            var queue = this._queue;
+            let queue = this._queue;
             if (order < this._eventDisplayOrder) {
                 queue[0].push(displayObject);
             } else {
                 if (order > this._eventDisplayOrder) {
                     this._eventDisplayOrder = order;
-                    var q = queue[1];
-                    for (var i = 0; i < q.length; i++) {
+                    let q = queue[1];
+                    for (let i = 0, l = q.length; i < l; i++) {
                         queue[0].push(q[i]);
                     }
                     queue[1].length = 0;
@@ -150,26 +160,29 @@ module pixi_display {
             }
         },
         _finishInteractionProcess: function (event: InteractionEvent, func: Function) {
-            var queue = this._queue;
-            var q = queue[0];
-            var i = 0;
-            for (; i < q.length; i++) {
+            let queue = this._queue;
+            let q = queue[0];
+            for (var i = 0, l = q.length; i < l; i++) {
                 if (event) {
                     //v4.3
-                    func(event, q[i], false);
+                    if (func) {
+                        func(event, q[i], false);
+                    }
                 } else {
                     //old
                     func(q[i], false);
                 }
             }
             q = queue[1];
-            for (i = 0; i < q.length; i++) {
+            for (var i = 0, l = q.length; i < l; i++) {
                 if (event) {
                     //v4.3
                     if (!event.target) {
                         event.target = q[i];
                     }
-                    func(event, q[i], true);
+                    if (func) {
+                        func(event, q[i], true);
+                    }
                 } else {
                     //old
                     func(q[i], true);
