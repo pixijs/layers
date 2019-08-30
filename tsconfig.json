@@ -1,15 +1,15 @@
 {
-	"compilerOptions": {
+    "compilerOptions": {
         "module": "none",
         "target": "es5",
-		"noImplicitAny": true,
-		"removeComments": true,
-		"preserveConstEnums": true,
+        "noImplicitAny": true,
+        "removeComments": true,
+        "preserveConstEnums": true,
         "outFile": "dist/pixi-layers.js",
         "sourceMap": true,
         "inlineSources": true,
         "declaration": true
-	},
+    },
     "include": [
         "src/**/*"
     ],
