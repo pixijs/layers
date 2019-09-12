@@ -14,6 +14,8 @@ declare namespace PIXI {
         updateOrder?: number;
         displayOrder?: number;
         layerableChildren?: boolean;
+        isLayer?: boolean;
+        containsPoint?(p: PIXI.IPoint): boolean;
     }
 }
 declare namespace PIXI.display {
