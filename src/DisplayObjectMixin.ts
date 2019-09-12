@@ -36,6 +36,13 @@ declare namespace PIXI {
          * Make it false for ParticleContainer
          */
         layerableChildren?: boolean
+
+	    /**
+	     * is Layer
+	     */
+	    isLayer?: boolean;
+
+	    containsPoint?(p: PIXI.IPoint): boolean;
     }
 }
 
@@ -47,7 +54,8 @@ declare namespace PIXI {
     zIndex: 0,
     updateOrder: 0,
     displayOrder: 0,
-    layerableChildren: true
+    layerableChildren: true,
+	isLayer: false
 });
 
 if (PIXI.ParticleContainer) {

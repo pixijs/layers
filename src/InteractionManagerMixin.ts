@@ -188,6 +188,31 @@ namespace pixi_display {
                     func(q[i], true);
                 }
             }
+	        const delayedEvents = this.delayedEvents;
+
+	        if (delayedEvents && delayedEvents.length)
+	        {
+		        // Reset the propagation hint, because we start deeper in the tree again.
+		        (event as any).stopPropagationHint = false;
+
+		        const delayedLen = delayedEvents.length;
+
+		        this.delayedEvents = [];
+
+		        for (let i = 0; i < delayedLen; i++)
+		        {
+			        const { displayObject, eventString, eventData } = delayedEvents[i];
+
+			        // When we reach the object we wanted to stop propagating at,
+			        // set the propagation hint.
+			        if (eventData.stopsPropagatingAt === displayObject)
+			        {
+				        eventData.stopPropagationHint = true;
+			        }
+
+			        this.dispatchEvent(displayObject, eventString, eventData);
+		        }
+	        }
         }
     });
 }
