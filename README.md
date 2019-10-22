@@ -129,7 +129,7 @@ Its a bit tricky. You have to put this thing in one of your root files that are 
 Make sure that you dont have two copies of pixiJS: one from html, one from browserify, it happens. You'll get strange errors like `renderer.incDisplayOrder is not a function` in that case.
 
 ```
-import * as PIXI from "pixi.js';
+import * as PIXI from "pixi.js";
 window.PIXI = PIXI;
 import "pixi-layers"; //or require("pixi-layers")
 ```
