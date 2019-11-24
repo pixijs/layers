@@ -33,6 +33,7 @@ namespace pixi_display {
             if ((displayObject as Stage).isStage) {
                 (displayObject as Stage).updateStage()
             }
+            patchInteractionManager(this.plugins.interaction);
             this._oldRender(displayObject, renderTexture, clear, transform, skipUpdateTransform);
         }
     });
@@ -57,6 +58,7 @@ namespace pixi_display {
                 if ((displayObject as Stage).isStage) {
                     (displayObject as Stage).updateStage()
                 }
+                patchInteractionManager(this.plugins.interaction);
                 this._oldRender(displayObject, renderTexture, clear, transform, skipUpdateTransform);
             }
         });
