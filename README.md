@@ -131,7 +131,7 @@ Make sure that you dont have two copies of pixiJS: one from html, one from brows
 ```
 import * as PIXI from "pixi.js";
 window.PIXI = PIXI;
-import "pixi-layers"; //or require("pixi-layers")
+require("pixi-layers")
 ```
 
 ### Advanced sorting
