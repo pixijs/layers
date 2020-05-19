@@ -124,14 +124,24 @@ Layer is representation of global Group in this particular stage.
 
 ### Webpack, browserify, Angular
 
-Its a bit tricky. You have to put this thing in one of your root files that are loaded before everything else!
+Pixi must first be provided as a plugin through your `webpack.config.js` for pixi-layers to work correctly:
 
-Make sure that you dont have two copies of pixiJS: one from html, one from browserify, it happens. You'll get strange errors like `renderer.incDisplayOrder is not a function` in that case.
+```js
+module.exports = {
+    // ...
+    plugins: [
+        new webpack.ProvidePlugin({
+            PIXI: 'pixi.js',
+        }),
+    ],
+};
+
+```
+You can then simply import pixi-layers:
 
 ```
 import * as PIXI from "pixi.js";
-window.PIXI = PIXI;
-require("pixi-layers")
+import "pixi-layers";
 ```
 
 ### Advanced sorting
