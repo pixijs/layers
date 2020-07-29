@@ -42,8 +42,8 @@
     "del": "^2.2.0",
     "mkdirp": "^0.5.1",
     "parallelshell": "^2.0.0",
+    "pixi.js-legacy": "^5.3.2",
     "rimraf": "^2.5.3",
-    "typescript": "^3.5.1",
-    "pixi.js-legacy": "^5.0.3"
+    "typescript": "^3.5.1"
   }
 }

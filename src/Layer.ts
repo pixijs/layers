@@ -75,7 +75,7 @@ namespace pixi_display {
                         renderer.renderTexture.clear(group.clearColor as any);
                     }
                 }
-                renderer.texture.unbind(rt);
+                renderer.texture.unbind(rt.baseTexture);
                 (rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;
                 (rt.baseTexture as any).framebuffer = (buffer.baseTexture as any).framebuffer;
 
@@ -112,7 +112,7 @@ namespace pixi_display {
 	        const db = this.doubleBuffer;
 
 	        if (group.useDoubleBuffer) {
-		        renderer.texture.unbind(rt);
+		        renderer.texture.unbind(rt.baseTexture);
 		        this.currentBufferIndex = 1 - this.currentBufferIndex;
 		        let buffer = db[this.currentBufferIndex];
 		        (rt.baseTexture as any)._glTextures = (buffer.baseTexture as any)._glTextures;

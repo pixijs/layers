@@ -54,7 +54,7 @@ declare namespace PIXI.display {
 declare namespace PIXI.display {
     import DisplayObject = PIXI.DisplayObject;
     import Point = PIXI.Point;
-    import InteractionEvent = PIXI.interaction.InteractionEvent;
+    import InteractionEvent = PIXI.InteractionEvent;
     function processInteractive51(strangeStuff: InteractionEvent | Point, displayObject: DisplayObject, func: Function, hitTest: boolean, interactive: boolean): void;
     function patchInteractionManager(interactionManager: any): void;
 }
@@ -87,10 +87,14 @@ declare namespace PIXI.display {
         insertChildrenAfterActive: boolean;
         beginWork(stage: Stage): void;
         endWork(): void;
-        useRenderTexture: boolean;
-        useDoubleBuffer: boolean;
-        clearColor: ArrayLike<number>;
-        sortPriority: number;
+        get useRenderTexture(): boolean;
+        set useRenderTexture(value: boolean);
+        get useDoubleBuffer(): boolean;
+        set useDoubleBuffer(value: boolean);
+        get clearColor(): ArrayLike<number>;
+        set clearColor(value: ArrayLike<number>);
+        get sortPriority(): number;
+        set sortPriority(value: number);
         getRenderTexture(): PIXI.RenderTexture;
         updateDisplayLayers(): void;
         doSort(): void;
@@ -103,7 +107,7 @@ declare namespace PIXI.display {
 declare namespace PIXI.display {
     import DisplayObject = PIXI.DisplayObject;
     import Point = PIXI.Point;
-    import InteractionEvent = PIXI.interaction.InteractionEvent;
+    import InteractionEvent = PIXI.InteractionEvent;
     class LayersTreeSearch {
         _tempPoint: Point;
         _queue: DisplayObject[][];

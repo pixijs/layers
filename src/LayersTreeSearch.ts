@@ -9,7 +9,7 @@ namespace pixi_display {
     import Point = PIXI.Point;
     import Graphics = PIXI.Graphics;
     import Container = PIXI.Container;
-    import InteractionEvent = PIXI.interaction.InteractionEvent;
+    import InteractionEvent = PIXI.InteractionEvent;
 
     export class LayersTreeSearch {
         _tempPoint = new Point();
