@@ -1,6 +1,6 @@
 {
   "name": "pixi-layers",
-  "version": "0.2.3",
+  "version": "0.3.0",
   "description": "PixiJS v5 plugin, allows to change rendering order of containers without changing the scene graph.",
   "author": "Ivan Popelyshev",
   "contributors": [
@@ -22,11 +22,7 @@
     "watch": "tsc -w",
     "prebuild": "yarn cleanup",
     "make:dts": "node scripts/make_dts.js",
-    "build": "tsc && yarn make:dts",
-    "check:browserify": "yarn checkpack -- browserify -e test/checkpack.ts",
-    "check:webpack": "yarn checkpack -- webpack -e test/checkpack.ts",
-    "check:vanillajs": "yarn checkpack -- vanillajs -e test/checkpack.ts",
-    "check:all": "yarn build && yarn check:browserify && yarn check:webpack && yarn check:vanillajs"
+    "build": "tsc && yarn make:dts"
   },
   "files": [
     "dist/",
@@ -38,12 +34,12 @@
     "README.md"
   ],
   "devDependencies": {
-    "checkpack": "^0.3",
     "del": "^2.2.0",
     "mkdirp": "^0.5.1",
     "parallelshell": "^2.0.0",
+    "pixi.js-legacy": "^5.3.3",
     "rimraf": "^2.5.3",
-    "typescript": "^3.5.1",
-    "pixi.js-legacy": "^5.0.3"
+    "tmp": "^0.2.1",
+    "typescript": "^3.5.1"
   }
 }

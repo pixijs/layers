@@ -7,7 +7,7 @@
 namespace pixi_display {
     import DisplayObject = PIXI.DisplayObject;
     import Point = PIXI.Point;
-    import InteractionEvent = PIXI.interaction.InteractionEvent;
+    import InteractionEvent = PIXI.InteractionEvent;
 
     export function processInteractive51(strangeStuff: InteractionEvent | Point, displayObject: DisplayObject, func: Function, hitTest: boolean, interactive: boolean) {
         if (!this.search) {

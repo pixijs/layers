@@ -1,9 +1,11 @@
 # pixi-layers
 Allows to change rendering order of pixi containers without changing the scene graph
 
-Works with PixiJS v5.
+Works with PixiJS >= v5.3
 
 For PixiJS v4 please use [layers branch](https://github.com/pixijs/pixi-layers/tree/layers)
+
+For PixiJS < v5.3 please use npm version 0.2.3
 
 Compiled files are located in "dist" folder
 
