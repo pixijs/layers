@@ -60,6 +60,11 @@ namespace pixi_display {
                 }
             }
 
+            if (db) {
+                db[0].framebuffer.multisample = rt.framebuffer.multisample;
+                db[1].framebuffer.multisample = rt.framebuffer.multisample;
+            }
+
             this._tempRenderTarget = renderer.renderTexture.current;
             this._tempRenderTargetSource.copyFrom(renderer.renderTexture.sourceFrame);
 
@@ -99,6 +104,7 @@ namespace pixi_display {
 
         popTexture(renderer: PIXI.Renderer) {
             renderer.batch.flush();
+            renderer.framebuffer.blit();
             // switch filters back
             const filterStack = renderer.filter.defaultFilterStack;
             if (filterStack.length > 1) {
