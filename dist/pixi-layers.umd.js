@@ -1,8 +1,8 @@
 /* eslint-disable */
  
 /*!
- * @pixi/layers - v1.0.0
- * Compiled Thu, 03 Jun 2021 14:53:37 UTC
+ * @pixi/layers - v1.0.1
+ * Compiled Thu, 03 Jun 2021 15:09:07 UTC
  *
  * @pixi/layers is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -228,7 +228,7 @@ this.PIXI.display = this.PIXI.display || {};
 
     function generateLayerRendererMethod(_oldRender) {
         return function render(displayObject, options, arg1, arg2, arg3) {
-            if (!options || (options.renderTexture || options.baseTexture)) {
+            if (!options || (!options.renderTexture && !options.baseTexture)) {
                 this._lastDisplayOrder = 0;
             }
             this._activeLayer = null;

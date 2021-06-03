@@ -1,6 +1,6 @@
 {
   "name": "@pixi/layers",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "PixiJS v6 plugin, allows to change rendering order of containers without changing the scene graph.",
   "author": "Ivan Popelyshev",
   "contributors": [
