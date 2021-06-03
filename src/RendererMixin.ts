@@ -19,7 +19,7 @@ function generateLayerRendererMethod(_oldRender: any)
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return function render(displayObject: DisplayObject, options: any, arg1: any, arg2: any, arg3: any)
     {
-        if (!options || (options.renderTexture || options.baseTexture))
+        if (!options || (!options.renderTexture && !options.baseTexture))
         {
             this._lastDisplayOrder = 0;
         }
