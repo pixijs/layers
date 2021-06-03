@@ -57,7 +57,7 @@ export function applyRendererMixin(rendererClass: any)
     });
 
     RendererProto._oldRender = RendererProto.render;
-    RendererProto._oldRender = generateLayerRendererMethod(RendererProto.render);
+    RendererProto.render = generateLayerRendererMethod(RendererProto.render);
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
