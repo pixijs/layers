@@ -29,7 +29,7 @@ If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or j
 Layer extends Container
 
 ```js
-import { Layer } from '@pixi/picture'
+import { Layer } from '@pixi/layers'
 
 let layer = new Layer();
 ```
