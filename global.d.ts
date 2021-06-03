@@ -1,6 +1,10 @@
-declare namespace PIXI {
+declare namespace GlobalMixins {
+    export interface Container {
+        containerRenderWebGL?(renderer: import('@pixi/core').Renderer): void;
+    }
+
     export interface DisplayObject {
-        parentGroup: pixi_display.Group,
+        parentGroup?: import('@pixi/layers').Group,
 
         /**
          * Object will be rendered
@@ -10,10 +14,10 @@ declare namespace PIXI {
          * its always null for layers
          *
          */
-        parentLayer?: pixi_display.Layer,
+        parentLayer?: import('@pixi/layers').Layer,
 
 
-        _activeParentLayer?: pixi_display.Layer,
+        _activeParentLayer?: import('@pixi/layers').Layer,
         /**
          * zOrder is used to sort element inside the layer
          * It can be used with zIndex together: First PixiJS v5 sorts elements by zIndex inside a container,
@@ -37,30 +41,16 @@ declare namespace PIXI {
          */
         layerableChildren?: boolean
 
-	    /**
-	     * is Layer
-	     */
-	    isLayer?: boolean;
+        /**
+         * is Layer
+         */
+        isLayer?: boolean;
 
-	    containsPoint?(p: PIXI.IPoint): boolean;
+        containsPoint?(p: import('@pixi/math').IPoint): boolean;
     }
-}
 
-(Object as any).assign(PIXI.DisplayObject.prototype, {
-    parentLayer: null,
-    _activeParentLayer: null,
-    parentGroup: null,
-    zOrder: 0,
-    zIndex: 0,
-    updateOrder: 0,
-    displayOrder: 0,
-    layerableChildren: true,
-	isLayer: false
-});
-
-if (PIXI.ParticleContainer) {
-    PIXI.ParticleContainer.prototype.layerableChildren = false;
-}
-else if ((PIXI as any).ParticleContainer) {
-    (PIXI as any).ParticleContainer.prototype.layerableChildren = false;
+    // need TextureSystem in pixi mixins
+    // interface TextureSystem {
+    //     bindForceLocation(texture: import('@pixi/core').BaseTexture, location: number): void;
+    // }
 }

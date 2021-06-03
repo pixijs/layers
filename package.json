@@ -1,13 +1,16 @@
 {
-  "name": "pixi-layers",
-  "version": "0.3.1",
-  "description": "PixiJS v5 plugin, allows to change rendering order of containers without changing the scene graph.",
+  "name": "@pixi/layers",
+  "version": "1.0.0",
+  "description": "PixiJS v6 plugin, allows to change rendering order of containers without changing the scene graph.",
   "author": "Ivan Popelyshev",
   "contributors": [
     "Ivan Popelyshev <ivan.popelyshev@gmail.com>"
   ],
   "main": "./dist/pixi-layers.js",
-  "types": "./dist/pixi-layers.d.ts",
+  "module": "./lib/pixi-layers.es.js",
+  "bundle": "./dist/pixi-layers.umd.js",
+  "namespace": "PIXI.display",
+  "types": "./index.d.ts",
   "homepage": "http://www.pixijs.com/",
   "bugs": "https://github.com/pixijs/pixi-layers/issues",
   "license": "MIT",
@@ -16,30 +19,69 @@
     "url": "https://github.com/pixijs/pixi-layers.git"
   },
   "scripts": {
-    "cleanup": "rimraf dist && mkdirp dist",
-    "prestart": "yarn cleanup",
-    "start": "parallelshell \"yarn watch\"",
+    "cleanup": "rimraf dist && mkdirp dist && rimraf lib && mkdirp lib && rimraf compile",
+    "prestart": "pnpm run cleanup",
+    "start": "parallelshell \"pnpm run watch\"",
     "watch": "tsc -w",
-    "prebuild": "yarn cleanup",
-    "make:dts": "node scripts/make_dts.js",
-    "build": "tsc && yarn make:dts"
+    "prebuild": "pnpm run cleanup",
+    "build": "rollup -c scripts/rollup.config.js && pnpm run build:types",
+    "build:types": "rimraf ./compile && tsc -p ./tsconfig.compile.json && api-extractor run && node scripts/injectGlobalMixins",
+    "docs": "typedoc --out ./docs/ --readme README.md ./src/",
+    "lint": "eslint ./src",
+    "unit-test": "floss --path test --"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist/",
-    "src/",
-    "CONTRIBUTING.md",
+    "lib/",
+    "index.d.ts",
     "LICENSE",
     "package.json",
-    "tsconfig.json",
     "README.md"
   ],
+  "peerDependencies": {
+    "@pixi/canvas-renderer": "^6.0.4",
+    "@pixi/constants": "^6.0.4",
+    "@pixi/core": "^6.0.4",
+    "@pixi/display": "^6.0.4",
+    "@pixi/math": "^6.0.4",
+    "@pixi/settings": "^6.0.4",
+    "@pixi/utils": "^6.0.4"
+  },
   "devDependencies": {
+    "@microsoft/api-extractor": "^7.15.2",
+    "@pixi-build-tools/rollup-configurator": "~1.0.11",
+    "@pixi/canvas-renderer": "^6.0.4",
+    "@pixi/constants": "^6.0.4",
+    "@pixi/core": "^6.0.4",
+    "@pixi/display": "^6.0.4",
+    "@pixi/eslint-config": "^2.0.1",
+    "@pixi/extract": "^6.0.4",
+    "@pixi/math": "^6.0.4",
+    "@pixi/settings": "^6.0.4",
+    "@pixi/utils": "^6.0.4",
+    "@rollup/plugin-node-resolve": "^8.4.0",
+    "@types/eventemitter3": "^2.0.2",
+    "@typescript-eslint/eslint-plugin": "^4.16.1",
+    "@typescript-eslint/parser": "^4.16.1",
+    "chai": "^4.3.3",
     "del": "^2.2.0",
+    "electron": "^9.4.0",
+    "eslint": "^7.21.0",
+    "floss": "^3.0.0",
+    "jsdoc": "^3.4.0",
     "mkdirp": "^0.5.1",
     "parallelshell": "^2.0.0",
-    "pixi.js-legacy": "^5.3.3",
+    "prepend": "=1.0.2",
+    "relative-deps": "^1.0.6",
     "rimraf": "^2.5.3",
-    "tmp": "^0.2.1",
-    "typescript": "^3.5.1"
+    "rollup": "^2.50.5",
+    "rollup-plugin-sourcemaps": "^0.6.2",
+    "rollup-plugin-terser": "^7.0.0",
+    "@rollup/plugin-typescript": "^8.2.1",
+    "tslib": "^2.2.0",
+    "typescript": "^4.3.2"
   }
 }

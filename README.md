@@ -1,17 +1,18 @@
 # pixi-layers
-Allows to change rendering order of pixi containers without changing the scene graph
 
-Works with PixiJS >= v5.3
+Allows to change rendering order of pixi containers without changing the scene graph.
 
-For PixiJS v4 please use [layers branch](https://github.com/pixijs/pixi-layers/tree/layers)
-
-For PixiJS < v5.3 please use npm version 0.2.3
-
-Compiled files are located in "dist" folder
+Works with pixi-v6.
 
 **Nothing will work if you dont create Stage and set it as root. Please do it or read full explanation.**
 
-### Examples
+### Migration from v5
+
+See [usage with canvas and particles](#usage-with-canvas-and-particles) part of this doc.
+
+If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or just use npm package `pixi-picture`
+
+## Examples
 
 [Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
 
@@ -23,43 +24,14 @@ Compiled files are located in "dist" folder
 
 [Double buffering - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/trail.js)
 
-### Migration from v4
+## Some explanations
 
-PixiJS v5 introduced zIndex sorting: 
-
-```js
-child.zIndex = 1;
-container.sortableChildren = true;
-```
-
-Therefore, to avoid any conflicts, pixi-layers sorts only by zOrder, 
-and zOrder works same direction as zIndex. 
-
-That means if you used `zIndex = sprite.y` or `zOrder = -sprite.y` in v4, now you have to use `zOrder=sprite.y`.
-Or you can override group sorting function so it sorts like before.
-
-However, you can use a hack for compatibility with v4:
-```js
-PIXI.display.Group.compareZIndex = function (a, b) {
-   if (a.zIndex !== b.zIndex) {
-       return a.zIndex - b.zIndex;
-   }
-   if (a.zOrder > b.zOrder) {
-       return -1;
-   }
-   if (a.zOrder < b.zOrder) {
-       return 1;
-   }
-   return a.updateOrder - b.updateOrder;
-}
-```
-
-### Some explanations
-
-PIXI.display.Layer extends Container
+Layer extends Container
 
 ```js
-var layer = new PIXI.display.Layer();
+import { Layer } from '@pixi/picture'
+
+let layer = new Layer();
 ```
 
 Pixi DisplayObject/Container can be rendered inside its layer instead of direct parent
@@ -114,36 +86,62 @@ When you move a character with attached sprites from different layers to a new s
 Instead, you can create a new display Group:
 
 ```
-var lightGroup = new PIXI.display.Group();
+let lightGroup = new Group();
 
 bunnySprite.parentGroup = lightGroup;
-var lightLayer = new PIXI.display.Layer(lightGroup); // only one layer per stage can be bound to same group
+let lightLayer = new Layer(lightGroup); // only one layer per stage can be bound to same group
 ```
 
 Groups are working between different stages, so when you move bunny it will be rendered in its light layer.
 
 Layer is representation of global Group in this particular stage.
 
-### Webpack, browserify, Angular
+## Vanilla JS, UMD build
 
-Its a bit tricky. You have to put this thing in one of your root files that are loaded before everything else!
+All pixiJS v6 plugins has special `umd` build suited for vanilla.   
+Navigate `pixi-layers` npm package, take `dist/pixi-layers.umd.js` file.
 
-Make sure that you dont have two copies of pixiJS: one from html, one from browserify, it happens. You'll get strange errors like `renderer.incDisplayOrder is not a function` in that case.
-
-```
-import * as PIXI from "pixi.js";
-window.PIXI = PIXI;
-require("pixi-layers")
+```html
+<script src='lib/pixi.js'></script>
+<script src='lib/pixi-layers.umd.js'></script>
 ```
 
-### Advanced sorting
+```js
+let layer = new PIXI.display.Layer();
+```
+
+## Usage with canvas and particles
+
+Due to changes in PixiJS architecture that allowed to build custom bundles, certain operations has to be called from your bundle or from your app.
+
+The important thing is to call it when you know that corresponding module is loaded. You can call it multiple times if you are not sure :) Welcome to es6 imports!
+
+If you use `@pixi/canvas-renderer`
+
+```js
+import * as PIXI from 'pixi.js-legacy';
+import { applyCanvasMixin } from '@pixi/layers';
+
+applyCanvasMixin(PIXI.CanvasRenderer);
+```
+
+If you use `@pixi/particles`
+
+```js
+import * as PIXI from 'pixi.js';
+import { applyCanvasMixin } from '@pixi/layers';
+
+applyParticleMixin(PIXI.ParticleContainer);
+```
+
+## Advanced sorting
 
 If you want sorting to affect children that have different parentLayer than their direct parent,
 please set the group `sortPriority`. For now, it has two values - 0 by default and 1 for special cases.
 
 Look at [Normals with sorting](http://pixijs.github.io/examples/#/layers/normals.js)
 
-### The legend
+## The legend
 
 Stage is the city. Containers are buildings, simple sprites are people.
 
@@ -173,3 +171,12 @@ It happens.
 
 1. Interaction is different, there might be bugs. Performance of processInteractive() can drop a bit.
 2. Non-renderable elements are not interactable. Elements with alpha=0 are interactable but their children are not.
+3. Plugin does not support new `@pixi/events` package yet.
+
+## How to build
+
+```bash
+pnpm install
+pnpm run build
+```
+

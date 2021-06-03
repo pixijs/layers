@@ -24,5 +24,18 @@ npm-debug.log
 node_modules
 docs/
 
+# pnpm
+.pnpm-debug.log
+
+# ESM
+lib
+
+# UMD
+dist/pixi-layers.js
+dist/pixi-layers.js.map
+
+# tsc compile
+compile
+
 # jetBrains IDE ignores
 .idea

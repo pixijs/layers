@@ -1,0 +1,14 @@
+{
+    "ignorePatterns": [
+        "lib",
+        "dist",
+        "index.d.ts"
+    ],
+    "rules": {
+        "linebreak-style": 0,
+        "@typescript-eslint/triple-slash-reference": 0
+    },
+    "extends": [
+        "@pixi/eslint-config"
+    ]
+}
