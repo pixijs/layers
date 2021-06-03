@@ -1,8 +1,8 @@
 /* eslint-disable */
  
 /*!
- * @pixi/layers - v1.0.1
- * Compiled Thu, 03 Jun 2021 15:09:07 UTC
+ * @pixi/layers - v1.0.2
+ * Compiled Thu, 03 Jun 2021 15:37:29 UTC
  *
  * @pixi/layers is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -258,13 +258,17 @@ this.PIXI.display = this.PIXI.display || {};
         RendererProto.render = generateLayerRendererMethod(RendererProto.render);
     }
     function applyCanvasMixin(canvasRenderClass) {
+        if (!canvasRenderClass) {
+            console.log('@pixi/layers: Canvas mixin was called with empty parameter. Are you sure that you even need this line?');
+            return;
+        }
+        applyRendererMixin(canvasRenderClass);
         const ContainerProto = display.Container.prototype;
         if (ContainerProto.containerRenderCanvas) {
             return;
         }
         ContainerProto.containerRenderCanvas = ContainerProto.renderCanvas;
         ContainerProto.renderCanvas = generateLayerContainerRenderMethod(ContainerProto.renderCanvas);
-        applyRendererMixin(canvasRenderClass);
     }
 
     class Group extends utils__namespace.EventEmitter {
