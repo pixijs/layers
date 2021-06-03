@@ -63,6 +63,16 @@ export function applyRendererMixin(rendererClass: any)
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function applyCanvasMixin(canvasRenderClass: any): void
 {
+    if (!canvasRenderClass)
+    {
+        // eslint-disable-next-line max-len,no-console
+        console.log('@pixi/layers: Canvas mixin was called with empty parameter. Are you sure that you even need this line?');
+
+        return;
+    }
+
+    applyRendererMixin(canvasRenderClass);
+
     const ContainerProto = Container.prototype as any;
 
     if (ContainerProto.containerRenderCanvas)
@@ -71,7 +81,5 @@ export function applyCanvasMixin(canvasRenderClass: any): void
     }
     ContainerProto.containerRenderCanvas = ContainerProto.renderCanvas;
     ContainerProto.renderCanvas = generateLayerContainerRenderMethod(ContainerProto.renderCanvas);
-
-    applyRendererMixin(canvasRenderClass);
 }
 
