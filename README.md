@@ -1,4 +1,4 @@
-# pixi-layers
+# @pixi/layers
 
 Allows to change rendering order of pixi containers without changing the scene graph.
 
