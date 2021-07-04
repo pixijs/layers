@@ -35,7 +35,7 @@ export class Group extends utils.EventEmitter
     /** Default zIndex value for layers that are created with this Group */
     public zIndex: number;
 
-    /** Enabling sorting objects within this group by {@link PIXI.DisplayObject#zIndex zIndex}. */
+    /** Enabling sorting objects within this group by {@link PIXI.DisplayObject#zOrder zOrder}. */
     public enableSort: boolean;
 
     private _activeLayer: Layer = null;

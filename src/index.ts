@@ -19,7 +19,9 @@ applyRendererMixin(Renderer);
  * The {@link Group group} in which this display object should be rendered.
  *
  * This is provided by **@pixi/layers**.
- * @member PIXI.DisplayObject#parentGroup
+ *
+ * @memberof PIXI.DisplayObject
+ * @member parentGroup
  */
 
 /**
@@ -28,7 +30,8 @@ applyRendererMixin(Renderer);
  *
  * This is provided by **@pixi/layers**.
  *
- * @member PIXI.DisplayObject#parentLayer
+ * @memberof PIXI.DisplayObject
+ * @member parentLayer
  */
 
 /**
@@ -39,5 +42,6 @@ applyRendererMixin(Renderer);
  *
  * This is provided by **@pixi/layers**.
  *
- * @member PIXI.DisplayObject#zOrder
+ * @memberof PIXI.DisplayObject
+ * @member zOrder
  */

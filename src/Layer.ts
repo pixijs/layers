@@ -187,7 +187,7 @@ export class LayerTextureCache
 /**
  * A {@link Layer layer} can be used to render {@link PIXI.DisplayObject}s in a different part of the scene graph together.
  *
- * A layer can be used to structure a scene graph in a data-oriented and separate the z-ordering hierarchy in
+ * A layer can be used to structure a scene graph in a data-oriented manner and separate the z-ordering hierarchy in
  * a different tree. Each layer is associated with a {@link Group} that provides the context for sorting objects
  * in the same layer.
  *
