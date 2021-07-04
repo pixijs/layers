@@ -6,8 +6,6 @@ import type { Stage } from './Stage';
 
 /**
  * A context for z-ordering {@link PIXI.DisplayObject}s within the same {@link Layer}.
- *
- * You can
  */
 export class Group extends utils.EventEmitter
 {
