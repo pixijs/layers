@@ -11,9 +11,16 @@ import type { Layer } from './Layer';
  */
 export interface ILayeredRenderer
 {
+    /** Order/index of last rendered object */
     _lastDisplayOrder: 0;
+
+    /** {@link Layer} currently being rendered */
     _activeLayer: Layer;
+
+    /** **Internal** method for updating {@link ILayeredRenderer#_lastDisplayOrder _lastDisplayOrder} */
     incDisplayOrder(): number;
+
+    /** **Internal** reference to old render method */
     _oldRender(displayObject: IRenderableObject, options?: IRendererRenderOptions): void;
 }
 
