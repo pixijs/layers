@@ -2,7 +2,7 @@
  
 /*!
  * @pixi/layers - v1.0.2
- * Compiled Thu, 03 Jun 2021 15:37:29 UTC
+ * Compiled Sun, 04 Jul 2021 19:03:07 UTC
  *
  * @pixi/layers is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -12,10 +12,10 @@
 this.PIXI = this.PIXI || {};
 this.PIXI.display = this.PIXI.display || {};
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@pixi/display'), require('@pixi/core'), require('@pixi/math'), require('@pixi/settings'), require('@pixi/utils')) :
-    typeof define === 'function' && define.amd ? define(['exports', '@pixi/display', '@pixi/core', '@pixi/math', '@pixi/settings', '@pixi/utils'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global._pixi_layers = {}, global.PIXI, global.PIXI, global.PIXI, global.PIXI, global.PIXI.utils));
-}(this, (function (exports, display, core, math, settings, utils) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@pixi/display'), require('@pixi/core'), require('@pixi/math'), require('@pixi/utils'), require('@pixi/settings')) :
+    typeof define === 'function' && define.amd ? define(['exports', '@pixi/display', '@pixi/core', '@pixi/math', '@pixi/utils', '@pixi/settings'], factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global._pixi_layers = {}, global.PIXI, global.PIXI, global.PIXI, global.PIXI.utils, global.PIXI));
+}(this, (function (exports, display, core, math, utils, settings) { 'use strict';
 
     function _interopNamespace(e) {
         if (e && e.__esModule) return e;
@@ -274,19 +274,17 @@ this.PIXI.display = this.PIXI.display || {};
     class Group extends utils__namespace.EventEmitter {
         constructor(zIndex, sorting) {
             super();
-            this._activeLayer = null;
-            this._activeStage = null;
-            this._activeChildren = [];
-            this._lastUpdateId = -1;
             this.useRenderTexture = false;
             this.useDoubleBuffer = false;
             this.sortPriority = 0;
             this.clearColor = new Float32Array([0, 0, 0, 0]);
             this.canDrawWithoutLayer = false;
             this.canDrawInParentStage = true;
-            this.zIndex = 0;
-            this.enableSort = false;
-            this.zIndex = zIndex;
+            this._activeLayer = null;
+            this._activeStage = null;
+            this._activeChildren = [];
+            this._lastUpdateId = -1;
+            this.zIndex = zIndex || 0;
             this.enableSort = !!sorting;
             if (typeof sorting === 'function') {
                 this.on('sort', sorting);
@@ -314,7 +312,7 @@ this.PIXI.display = this.PIXI.display || {};
             this._activeStage = null;
             this._activeChildren.length = 0;
         }
-        addDisplayObject(stage, displayObject) {
+        _resolveChildDisplayObject(stage, displayObject) {
             this.check(stage);
             displayObject._activeParentLayer = this._activeLayer;
             if (this._activeLayer) {
@@ -324,18 +322,13 @@ this.PIXI.display = this.PIXI.display || {};
                 this._activeChildren.push(displayObject);
             }
         }
-        foundLayer(stage, layer) {
+        _resolveLayer(stage, layer) {
             this.check(stage);
-            if (this._activeLayer != null) {
+            if (this._activeLayer) {
                 Group.conflict();
             }
             this._activeLayer = layer;
             this._activeStage = stage;
-        }
-        foundStage(stage) {
-            if (!this._activeLayer && !this.canDrawInParentStage) {
-                this.clear();
-            }
         }
         check(stage) {
             if (this._lastUpdateId < Group._layerUpdateId) {
@@ -357,7 +350,7 @@ this.PIXI.display = this.PIXI.display || {};
         static conflict() {
             if (Group._lastLayerConflict + 5000 < Date.now()) {
                 Group._lastLayerConflict = Date.now();
-                console.log(`PIXI-display plugin found two layers with the same group in one stage - that's not healthy. Please place a breakpoint here and debug it`);
+                console.log(`@pixi/layers found two layers with the same group in one stage - that's not healthy. Please place a breakpoint here and debug it`);
             }
         }
     }
@@ -373,7 +366,7 @@ this.PIXI.display = this.PIXI.display || {};
             this._tempRenderTarget = null;
             this._tempRenderTargetSource = new math.Rectangle();
         }
-        initRenderTexture(renderer) {
+        init(renderer) {
             const width = renderer ? renderer.screen.width : 100;
             const height = renderer ? renderer.screen.height : 100;
             const resolution = renderer ? renderer.resolution : settings.settings.RESOLUTION;
@@ -387,14 +380,14 @@ this.PIXI.display = this.PIXI.display || {};
         }
         getRenderTexture() {
             if (!this.renderTexture) {
-                this.initRenderTexture();
+                this.init();
             }
             return this.renderTexture;
         }
         pushTexture(renderer) {
             const screen = renderer.screen;
             if (!this.renderTexture) {
-                this.initRenderTexture(renderer);
+                this.init(renderer);
             }
             const rt = this.renderTexture;
             const group = this.layer.group;
@@ -486,7 +479,7 @@ this.PIXI.display = this.PIXI.display || {};
             this._tempLayerParent = null;
             this.insertChildrenBeforeActive = true;
             this.insertChildrenAfterActive = true;
-            if (group != null) {
+            if (group) {
                 this.group = group;
                 this.zIndex = group.zIndex;
             }
@@ -494,44 +487,6 @@ this.PIXI.display = this.PIXI.display || {};
                 this.group = new Group(0, false);
             }
             this._tempChildren = this.children;
-        }
-        beginWork(stage) {
-            const active = this._activeChildren;
-            this._activeStageParent = stage;
-            this.group.foundLayer(stage, this);
-            const groupChildren = this.group._activeChildren;
-            active.length = 0;
-            for (let i = 0; i < groupChildren.length; i++) {
-                groupChildren[i]._activeParentLayer = this;
-                active.push(groupChildren[i]);
-            }
-            groupChildren.length = 0;
-        }
-        endWork() {
-            const children = this.children;
-            const active = this._activeChildren;
-            const sorted = this._sortedChildren;
-            for (let i = 0; i < active.length; i++) {
-                this.emit('display', active[i]);
-            }
-            sorted.length = 0;
-            if (this.insertChildrenBeforeActive) {
-                for (let i = 0; i < children.length; i++) {
-                    sorted.push(children[i]);
-                }
-            }
-            for (let i = 0; i < active.length; i++) {
-                sorted.push(active[i]);
-            }
-            if (!this.insertChildrenBeforeActive
-                && this.insertChildrenAfterActive) {
-                for (let i = 0; i < children.length; i++) {
-                    sorted.push(children[i]);
-                }
-            }
-            if (this.group.enableSort) {
-                this.doSort();
-            }
         }
         get useRenderTexture() {
             return this.group.useRenderTexture;
@@ -566,7 +521,74 @@ this.PIXI.display = this.PIXI.display || {};
         doSort() {
             this.group.doSort(this, this._sortedChildren);
         }
-        _preRender(renderer) {
+        destroy(options) {
+            if (this.textureCache) {
+                this.textureCache.destroy();
+                this.textureCache = null;
+            }
+            super.destroy(options);
+        }
+        render(renderer) {
+            if (!this.prerender(renderer)) {
+                return;
+            }
+            if (this.group.useRenderTexture) {
+                if (!this.textureCache) {
+                    this.textureCache = new LayerTextureCache(this);
+                }
+                this.textureCache.pushTexture(renderer);
+            }
+            this.containerRenderWebGL(renderer);
+            this.postrender(renderer);
+            if (this.group.useRenderTexture) {
+                this.textureCache.popTexture(renderer);
+            }
+        }
+        renderCanvas(renderer) {
+            if (this.prerender(renderer)) {
+                this.containerRenderCanvas(renderer);
+                this.postrender(renderer);
+            }
+        }
+        _onBeginLayerSubtreeTraversal(stage) {
+            const active = this._activeChildren;
+            this._activeStageParent = stage;
+            this.group._resolveLayer(stage, this);
+            const groupChildren = this.group._activeChildren;
+            active.length = 0;
+            for (let i = 0; i < groupChildren.length; i++) {
+                groupChildren[i]._activeParentLayer = this;
+                active.push(groupChildren[i]);
+            }
+            groupChildren.length = 0;
+        }
+        _onEndLayerSubtreeTraversal() {
+            const children = this.children;
+            const active = this._activeChildren;
+            const sorted = this._sortedChildren;
+            for (let i = 0; i < active.length; i++) {
+                this.emit('display', active[i]);
+            }
+            sorted.length = 0;
+            if (this.insertChildrenBeforeActive) {
+                for (let i = 0; i < children.length; i++) {
+                    sorted.push(children[i]);
+                }
+            }
+            for (let i = 0; i < active.length; i++) {
+                sorted.push(active[i]);
+            }
+            if (!this.insertChildrenBeforeActive
+                && this.insertChildrenAfterActive) {
+                for (let i = 0; i < children.length; i++) {
+                    sorted.push(children[i]);
+                }
+            }
+            if (this.group.enableSort) {
+                this.doSort();
+            }
+        }
+        prerender(renderer) {
             if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer) {
                 return false;
             }
@@ -588,41 +610,12 @@ this.PIXI.display = this.PIXI.display || {};
             renderer._activeLayer = this;
             return true;
         }
-        _postRender(renderer) {
+        postrender(renderer) {
             this.children = this._tempChildren;
             renderer._activeLayer = this._tempLayerParent;
             this._tempLayerParent = null;
         }
-        render(renderer) {
-            if (!this._preRender(renderer)) {
-                return;
-            }
-            if (this.group.useRenderTexture) {
-                if (!this.textureCache) {
-                    this.textureCache = new LayerTextureCache(this);
-                }
-                this.textureCache.pushTexture(renderer);
-            }
-            this.containerRenderWebGL(renderer);
-            this._postRender(renderer);
-            if (this.group.useRenderTexture) {
-                this.textureCache.popTexture(renderer);
-            }
-        }
-        destroy(options) {
-            if (this.textureCache) {
-                this.textureCache.destroy();
-                this.textureCache = null;
-            }
-            super.destroy(options);
-        }
     }
-    Layer.prototype.renderCanvas = function renderCanvas(renderer) {
-        if (this._preRender(renderer)) {
-            this.containerRenderCanvas(renderer);
-            this._postRender(renderer);
-        }
-    };
 
     class Stage extends Layer {
         constructor() {
@@ -640,6 +633,37 @@ this.PIXI.display = this.PIXI.display || {};
             this.clear();
             super.destroy(options);
         }
+        updateStage() {
+            this._activeParentStage = null;
+            Group._layerUpdateId++;
+            this._updateStageInner();
+        }
+        updateAsChildStage(stage) {
+            this._activeParentStage = stage;
+            Stage._updateOrderCounter = 0;
+            this._updateStageInner();
+        }
+        _updateStageInner() {
+            this.clear();
+            this._addRecursive(this);
+            const layers = this._activeLayers;
+            for (let i = 0; i < layers.length; i++) {
+                const layer = layers[i];
+                if (layer.group.sortPriority) {
+                    layer._onEndLayerSubtreeTraversal();
+                    const sorted = layer._sortedChildren;
+                    for (let j = 0; j < sorted.length; j++) {
+                        this._addRecursiveChildren(sorted[j]);
+                    }
+                }
+            }
+            for (let i = 0; i < layers.length; i++) {
+                const layer = layers[i];
+                if (!layer.group.sortPriority) {
+                    layer._onEndLayerSubtreeTraversal();
+                }
+            }
+        }
         _addRecursive(displayObject) {
             if (!displayObject.visible) {
                 return;
@@ -647,7 +671,7 @@ this.PIXI.display = this.PIXI.display || {};
             if (displayObject.isLayer) {
                 const layer = displayObject;
                 this._activeLayers.push(layer);
-                layer.beginWork(this);
+                layer._onBeginLayerSubtreeTraversal(this);
             }
             if (displayObject !== this && displayObject.isStage) {
                 const stage = displayObject;
@@ -655,13 +679,13 @@ this.PIXI.display = this.PIXI.display || {};
                 return;
             }
             let group = displayObject.parentGroup;
-            if (group != null) {
-                group.addDisplayObject(this, displayObject);
+            if (group) {
+                group._resolveChildDisplayObject(this, displayObject);
             }
             const layer = displayObject.parentLayer;
-            if (layer != null) {
+            if (layer) {
                 group = layer.group;
-                group.addDisplayObject(this, displayObject);
+                group._resolveChildDisplayObject(this, displayObject);
             }
             displayObject.updateOrder = ++Stage._updateOrderCounter;
             if (displayObject.alpha <= 0 || !displayObject.renderable
@@ -687,37 +711,6 @@ this.PIXI.display = this.PIXI.display || {};
                     this._addRecursive(children[i]);
                 }
             }
-        }
-        _updateStageInner() {
-            this.clear();
-            this._addRecursive(this);
-            const layers = this._activeLayers;
-            for (let i = 0; i < layers.length; i++) {
-                const layer = layers[i];
-                if (layer.group.sortPriority) {
-                    layer.endWork();
-                    const sorted = layer._sortedChildren;
-                    for (let j = 0; j < sorted.length; j++) {
-                        this._addRecursiveChildren(sorted[j]);
-                    }
-                }
-            }
-            for (let i = 0; i < layers.length; i++) {
-                const layer = layers[i];
-                if (!layer.group.sortPriority) {
-                    layer.endWork();
-                }
-            }
-        }
-        updateAsChildStage(stage) {
-            this._activeParentStage = stage;
-            Stage._updateOrderCounter = 0;
-            this._updateStageInner();
-        }
-        updateStage() {
-            this._activeParentStage = null;
-            Group._layerUpdateId++;
-            this._updateStageInner();
         }
     }
     Stage._updateOrderCounter = 0;

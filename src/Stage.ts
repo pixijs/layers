@@ -1,16 +1,18 @@
-/**
- * Container for layers
- *
- */
 import { Container, DisplayObject } from '@pixi/display';
 import { Layer } from './Layer';
 import { Group } from './Group';
 
+/**
+ * The {@link Stage stage} manages all the layers in its scene tree.
+ *
+ *
+ */
 export class Stage extends Layer
 {
     static _updateOrderCounter = 0;
 
-    isStage = true;
+    /** Flags that this is a {@link Stage stage}! */
+    public readonly isStage = true;
 
     _tempGroups: Array<DisplayObject> = [];
 
@@ -39,11 +41,59 @@ export class Stage extends Layer
     }
 
     /**
+     * This should be called before rendering for resolving items in the scene tree to their {@link Layer layers}.
      *
-     * @param displayObject {PIXI.DisplayObject} container that we are adding to Stage
-     * @private
+     * If your scene's root is a {@link Stage}, then the {@link ILayerRenderer} mixin will automatically
+     * call it.
      */
-    _addRecursive(displayObject: DisplayObject): void
+    updateStage(): void
+    {
+        this._activeParentStage = null;
+        Group._layerUpdateId++;
+        this._updateStageInner();
+    }
+
+    private updateAsChildStage(stage: Stage): void
+    {
+        this._activeParentStage = stage;
+        Stage._updateOrderCounter = 0;
+        this._updateStageInner();
+    }
+
+    private _updateStageInner(): void
+    {
+        this.clear();
+        this._addRecursive(this);
+        const layers = this._activeLayers;
+
+        for (let i = 0; i < layers.length; i++)
+        {
+            const layer = layers[i];
+
+            if (layer.group.sortPriority)
+            {
+                layer._onEndLayerSubtreeTraversal();
+                const sorted = layer._sortedChildren;
+
+                for (let j = 0; j < sorted.length; j++)
+                {
+                    this._addRecursiveChildren(sorted[j]);
+                }
+            }
+        }
+
+        for (let i = 0; i < layers.length; i++)
+        {
+            const layer = layers[i];
+
+            if (!layer.group.sortPriority)
+            {
+                layer._onEndLayerSubtreeTraversal();
+            }
+        }
+    }
+
+    private _addRecursive(displayObject: DisplayObject): void
     {
         if (!displayObject.visible)
         {
@@ -55,7 +105,7 @@ export class Stage extends Layer
             const layer = displayObject as any as Layer;
 
             this._activeLayers.push(layer);
-            layer.beginWork(this);
+            layer._onBeginLayerSubtreeTraversal(this);
         }
 
         if (displayObject !== this && (displayObject as any).isStage)
@@ -67,23 +117,18 @@ export class Stage extends Layer
             return;
         }
 
-        // sometimes people put UNDEFINED in parentGroup or parentLayer
-        // that's why there is != instead of !==
-
         let group = displayObject.parentGroup;
 
-        // eslint-disable-next-line eqeqeq,no-eq-null
-        if (group != null)
+        if (group)
         {
-            group.addDisplayObject(this, displayObject);
+            group._resolveChildDisplayObject(this, displayObject);
         }
         const layer = displayObject.parentLayer;
 
-        // eslint-disable-next-line eqeqeq,no-eq-null
-        if (layer != null)
+        if (layer)
         {
             group = layer.group;
-            group.addDisplayObject(this, displayObject);
+            group._resolveChildDisplayObject(this, displayObject);
         }
 
         displayObject.updateOrder = ++Stage._updateOrderCounter;
@@ -105,7 +150,7 @@ export class Stage extends Layer
         }
     }
 
-    _addRecursiveChildren(displayObject: DisplayObject): void
+    private _addRecursiveChildren(displayObject: DisplayObject): void
     {
         if (displayObject.alpha <= 0 || !displayObject.renderable
             || !displayObject.layerableChildren)
@@ -121,52 +166,5 @@ export class Stage extends Layer
                 this._addRecursive(children[i]);
             }
         }
-    }
-
-    _updateStageInner(): void
-    {
-        this.clear();
-        this._addRecursive(this);
-        const layers = this._activeLayers;
-
-        for (let i = 0; i < layers.length; i++)
-        {
-            const layer = layers[i];
-
-            if (layer.group.sortPriority)
-            {
-                layer.endWork();
-                const sorted = layer._sortedChildren;
-
-                for (let j = 0; j < sorted.length; j++)
-                {
-                    this._addRecursiveChildren(sorted[j]);
-                }
-            }
-        }
-
-        for (let i = 0; i < layers.length; i++)
-        {
-            const layer = layers[i];
-
-            if (!layer.group.sortPriority)
-            {
-                layer.endWork();
-            }
-        }
-    }
-
-    updateAsChildStage(stage: Stage): void
-    {
-        this._activeParentStage = stage;
-        Stage._updateOrderCounter = 0;
-        this._updateStageInner();
-    }
-
-    updateStage(): void
-    {
-        this._activeParentStage = null;
-        Group._layerUpdateId++;
-        this._updateStageInner();
     }
 }

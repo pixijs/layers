@@ -2,27 +2,32 @@
  * Created by ivanp on 29.01.2017.
  */
 
+import { Container } from '@pixi/display';
+import { Group } from './Group';
 import { RenderTexture, Renderer } from '@pixi/core';
 import { Rectangle } from '@pixi/math';
 import { settings } from '@pixi/settings';
-import { Container, DisplayObject } from '@pixi/display';
-import { Group } from './Group';
+
+import type { DisplayObject, IDestroyOptions } from '@pixi/display';
 import type { Stage } from './Stage';
 import type { ILayeredRenderer } from './RendererMixin';
 
+/**
+ * This manages the render-texture a {@link Layer} renders into.
+ *
+ * This is used internally by {@link Layer#render}.
+ */
 export class LayerTextureCache
 {
-    constructor(public layer: Layer)
-    {
-    }
+    constructor(public layer: Layer) {}
 
-    renderTexture: RenderTexture = null;
-    doubleBuffer: Array<RenderTexture> = null;
-    currentBufferIndex = 0;
+    private renderTexture: RenderTexture = null;
+    private doubleBuffer: Array<RenderTexture> = null;
+    private currentBufferIndex = 0;
     _tempRenderTarget: RenderTexture = null;
     _tempRenderTargetSource = new Rectangle();
 
-    initRenderTexture(renderer?: Renderer): void
+    private init(renderer?: Renderer): void
     {
         const width = renderer ? renderer.screen.width : 100;
         const height = renderer ? renderer.screen.height : 100;
@@ -39,16 +44,18 @@ export class LayerTextureCache
         }
     }
 
+    /** See {@link Layer#getRenderTexture}. */
     getRenderTexture(): RenderTexture
     {
         if (!this.renderTexture)
         {
-            this.initRenderTexture();
+            this.init();
         }
 
         return this.renderTexture;
     }
 
+    /** Prepares the layer's render-texture and set it as the render-target. */
     pushTexture(renderer: Renderer): void
     {
         // TODO: take not screen, but offset screen, in case there's matrix transform
@@ -56,7 +63,7 @@ export class LayerTextureCache
 
         if (!this.renderTexture)
         {
-            this.initRenderTexture(renderer);
+            this.init(renderer);
         }
 
         const rt = this.renderTexture;
@@ -131,6 +138,7 @@ export class LayerTextureCache
         }
     }
 
+    /** Flushes the renderer and restores the old render-target. */
     popTexture(renderer: Renderer): void
     {
         renderer.batch.flush();
@@ -161,6 +169,7 @@ export class LayerTextureCache
         }
     }
 
+    /** Destroy the texture-cache. Set {@link Layer.textureCache} to {@code null} after destroying it! */
     destroy(): void
     {
         if (this.renderTexture)
@@ -175,13 +184,44 @@ export class LayerTextureCache
     }
 }
 
+/**
+ * A {@link Layer layer} can be used to render {@link PIXI.DisplayObject}s in a different part of the scene graph together.
+ *
+ * A layer can be used to structure a scene graph in a data-oriented manner and separate the z-ordering hierarchy in
+ * a different tree. Each layer is associated with a {@link Group} that provides the context for sorting objects
+ * in the same layer.
+ *
+ * All layers must be placed underneath a {@link Stage} - generally, you should assign a {@link Stage} as your
+ * scene's root.
+ */
 export class Layer extends Container
 {
+    /** Flags that this container is a layer! */
+    public readonly isLayer = true;
+
+    /** The group of {@link DisplayObject}s that are rendered within this layer */
+    public group: Group = null;
+
+    /** The texture manager used when rendering into a {@link Layer#useRenderTexture layer render-texture}. */
+    public textureCache: LayerTextureCache;
+
+    _activeChildren: Array<DisplayObject> = [];
+    _tempChildren: Array<DisplayObject> = null;
+    _activeStageParent: Stage = null;
+    _sortedChildren: Array<DisplayObject> = [];
+    _tempLayerParent: Layer = null;
+
+    insertChildrenBeforeActive = true;
+    insertChildrenAfterActive = true;
+
+    /**
+     * @param group - The group of {@link DisplayObject}s to be rendered by this layer.
+     */
     constructor(group: Group = null)
     {
         super();
-        // eslint-disable-next-line eqeqeq,no-eq-null
-        if (group != null)
+
+        if (group)
         {
             this.group = group;
             this.zIndex = group.zIndex;
@@ -190,27 +230,151 @@ export class Layer extends Container
         {
             this.group = new Group(0, false);
         }
+
         this._tempChildren = this.children;
     }
 
-    isLayer = true;
-    group: Group = null;
-    _activeChildren: Array<DisplayObject> = [];
-    _tempChildren: Array<DisplayObject> = null;
-    _activeStageParent: Stage = null;
-    _sortedChildren: Array<DisplayObject> = [];
-    _tempLayerParent: Layer = null;
-
-    textureCache: LayerTextureCache;
-    insertChildrenBeforeActive = true;
-    insertChildrenAfterActive = true;
-
-    beginWork(stage: Stage): void
+    /**
+     * Flags whether this layer should render into a render-texture.
+     *
+     * This is useful if you want to use the layer as a texture elsewhere - for example, in sprites or to apply
+     * filters. The layer's render-texture is resized to the size of the renderer's screen.
+     */
+    get useRenderTexture(): boolean
     {
+        return this.group.useRenderTexture;
+    }
+    set useRenderTexture(value: boolean)
+    {
+        this.group.useRenderTexture = value;
+    }
+
+    /**
+     * This will enable double buffering for this layer.
+     *
+     * This layer will keep two render-textures to render into - choosing one each frame on a flip-flop
+     * basis. This is useful when you
+     *
+     * **Caveat**: You must enable {@link Layer#useRenderTexture} to prevent framebuffer errors in rendering.
+     */
+    get useDoubleBuffer(): boolean
+    {
+        return this.group.useDoubleBuffer;
+    }
+    set useDoubleBuffer(value: boolean)
+    {
+        this.group.useDoubleBuffer = value;
+    }
+
+    /**
+     * The background color to clear the layer.
+     *
+     * This should be used when {@link Layer#useRenderTexture} is enabled.
+     */
+    get clearColor(): ArrayLike<number>
+    {
+        return this.group.clearColor;
+    }
+    set clearColor(value: ArrayLike<number>)
+    {
+        this.group.clearColor = value;
+    }
+
+    get sortPriority(): number
+    {
+        return this.group.sortPriority;
+    }
+    set sortPriority(value: number)
+    {
+        this.group.sortPriority = value;
+    }
+
+    /**
+     * The rendering {@link Layer#useRenderTexture into a render-texture} is enabled, this will return
+     * the render-texture used by this layer.
+     */
+    getRenderTexture(): RenderTexture
+    {
+        if (!this.textureCache)
+        {
+            this.textureCache = new LayerTextureCache(this);
+        }
+
+        return this.textureCache.getRenderTexture();
+    }
+
+    /**
+     * you can override this method for this particular layer, if you want
+     */
+    public doSort(): void
+    {
+        this.group.doSort(this, this._sortedChildren);
+    }
+
+    /** @override */
+    public destroy(options?: IDestroyOptions): void
+    {
+        if (this.textureCache)
+        {
+            this.textureCache.destroy();
+            this.textureCache = null;
+        }
+
+        super.destroy(options);
+    }
+
+    /** @override */
+    public render(renderer: Renderer): void
+    {
+        if (!this.prerender(renderer as any))
+        {
+            return;
+        }
+
+        if (this.group.useRenderTexture)
+        {
+            if (!this.textureCache)
+            {
+                this.textureCache = new LayerTextureCache(this);
+            }
+            this.textureCache.pushTexture(renderer);
+        }
+
+        this.containerRenderWebGL(renderer);
+        this.postrender(renderer as any);
+
+        if (this.group.useRenderTexture)
+        {
+            this.textureCache.popTexture(renderer);
+        }
+    }
+
+    /** @override */
+    public renderCanvas(renderer: ILayeredRenderer): void
+    {
+        if (this.prerender(renderer))
+        {
+            this.containerRenderCanvas(renderer);
+            this.postrender(renderer);
+        }
+    }
+
+    /**
+     * This should be called when the layer is found while traversing the scene for updating object-layer association.
+     *
+     * This is an **internal** method.
+     *
+     * @see Stage#updateStage
+     */
+    _onBeginLayerSubtreeTraversal(stage: Stage): void
+    {
+        // This will transfer all "_activeChildren" of "this.group" into "this._activeChildren". This is done
+        // because a DisplayObject in that group may be placed before the layer in the scene tree.
+
         const active = this._activeChildren;
 
         this._activeStageParent = stage;
-        this.group.foundLayer(stage, this);
+        this.group._resolveLayer(stage, this);
         const groupChildren = this.group._activeChildren;
 
         active.length = 0;
@@ -222,7 +386,14 @@ export class Layer extends Container
         groupChildren.length = 0;
     }
 
-    endWork(): void
+    /**
+     * This should be called when the full subtree of the layer has been traversed while updating the stage's scene.
+     *
+     * This is an **internal** method.
+     *
+     * @see Stage#updateStage
+     */
+    _onEndLayerSubtreeTraversal(): void
     {
         const children = this.children;
         const active = this._activeChildren;
@@ -260,65 +431,17 @@ export class Layer extends Container
         }
     }
 
-    get useRenderTexture(): boolean
-    {
-        return this.group.useRenderTexture;
-    }
-
-    set useRenderTexture(value: boolean)
-    {
-        this.group.useRenderTexture = value;
-    }
-
-    get useDoubleBuffer(): boolean
-    {
-        return this.group.useDoubleBuffer;
-    }
-
-    set useDoubleBuffer(value: boolean)
-    {
-        this.group.useDoubleBuffer = value;
-    }
-
-    get clearColor(): ArrayLike<number>
-    {
-        return this.group.clearColor;
-    }
-
-    set clearColor(value: ArrayLike<number>)
-    {
-        this.group.clearColor = value;
-    }
-
-    get sortPriority(): number
-    {
-        return this.group.sortPriority;
-    }
-
-    set sortPriority(value: number)
-    {
-        this.group.sortPriority = value;
-    }
-
-    getRenderTexture(): RenderTexture
-    {
-        if (!this.textureCache)
-        {
-            this.textureCache = new LayerTextureCache(this);
-        }
-
-        return this.textureCache.getRenderTexture();
-    }
-
     /**
-     * you can override this method for this particular layer, if you want
+     * Prepares the renderer for this layer.
+     *
+     * It will assign {@link PIXI.Renderer#_activeLayer} to {@code this}, and set the active layer before
+     * this to {@link Layer#_activeParentLayer _activeParentLayer}. It will also temporarily sort the
+     * children by z-order.
+     *
+     * @return `true`, if the layer needs to be rendered; `false`, when the layer is invisible or has
+     * zero alpha.
      */
-    doSort(): void
-    {
-        this.group.doSort(this, this._sortedChildren);
-    }
-
-    _preRender(renderer: ILayeredRenderer): boolean
+    protected prerender(renderer: ILayeredRenderer): boolean
     {
         // eslint-disable-next-line eqeqeq
         if (this._activeParentLayer && this._activeParentLayer != renderer._activeLayer)
@@ -362,55 +485,16 @@ export class Layer extends Container
         return true;
     }
 
-    _postRender(renderer: ILayeredRenderer): void
+    /**
+     * Cleans up the renderer after this layer is rendered.
+     *
+     * It restores {@link Renderer#_activeLayer} to the parent layer and restores the canonical
+     * order of children.
+     */
+    protected postrender(renderer: ILayeredRenderer): void
     {
         (this as any).children = this._tempChildren;
         renderer._activeLayer = this._tempLayerParent;
         this._tempLayerParent = null;
     }
-
-    render(renderer: Renderer): void
-    {
-        if (!this._preRender(renderer as any))
-        {
-            return;
-        }
-
-        if (this.group.useRenderTexture)
-        {
-            if (!this.textureCache)
-            {
-                this.textureCache = new LayerTextureCache(this);
-            }
-            this.textureCache.pushTexture(renderer);
-        }
-
-        this.containerRenderWebGL(renderer);
-        this._postRender(renderer as any);
-
-        if (this.group.useRenderTexture)
-        {
-            this.textureCache.popTexture(renderer);
-        }
-    }
-
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    destroy(options?: any): void
-    {
-        if (this.textureCache)
-        {
-            this.textureCache.destroy();
-            this.textureCache = null;
-        }
-        super.destroy(options);
-    }
 }
-
-(Layer.prototype as any).renderCanvas = function renderCanvas(renderer: ILayeredRenderer)
-{
-    if (this._preRender(renderer))
-    {
-        this.containerRenderCanvas(renderer);
-        this._postRender(renderer);
-    }
-};

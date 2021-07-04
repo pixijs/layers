@@ -1,5 +1,6 @@
 import { DisplayObject, Container } from '@pixi/display';
 
+/** @ignore */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function generateLayerContainerRenderMethod(originalRender: any)
 {
@@ -33,6 +34,11 @@ export function generateLayerContainerRenderMethod(originalRender: any)
 }
 
 // special case - container render method, because we want it to be faster
+/**
+ * @internal
+ * @private
+ * @ignore
+ */
 function containerRender(renderer: any): void
 {
     if (this._activeParentLayer && this._activeParentLayer !== renderer._activeLayer)
@@ -85,6 +91,7 @@ export function applyDisplayMixin(): void
     ContainerProto.render = containerRender;
 }
 
+/** Apply mixin to your custom Container class (not needed if using built-in {@link PIXI.Container}) */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function applyContainerRenderMixin(CustomRenderContainer: any): void
 {
@@ -103,6 +110,7 @@ export function applyContainerRenderMixin(CustomRenderContainer: any): void
     }
 }
 
+/** Apply mixin for particles */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function applyParticleMixin(ParticleContainer: any): void
 {

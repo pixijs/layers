@@ -1,29 +1,43 @@
 import { IRenderableObject, IRendererRenderOptions, Renderer } from '@pixi/core';
-import { Container, DisplayObject } from '@pixi/display';
+import { Container } from '@pixi/display';
 import { LayersTreeSearch } from './LayersTreeSearch';
 import { generateLayerContainerRenderMethod } from './DisplayMixin';
+
 import type { Stage } from './Stage';
 import type { Layer } from './Layer';
 
+/**
+ * Mixin applied on {@link PIXI.Renderer} when using @pixi/layers.
+ */
 export interface ILayeredRenderer
 {
-    _lastDisplayOrder: 0;
+    /** Order/index of last rendered object */
+    _lastDisplayOrder: number;
+
+    /** {@link Layer} currently being rendered */
     _activeLayer: Layer;
+
+    /** **Internal** method for updating {@link ILayeredRenderer#_lastDisplayOrder} */
     incDisplayOrder(): number;
+
+    /** **Internal** reference to old render method */
     _oldRender(displayObject: IRenderableObject, options?: IRendererRenderOptions): void;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/**
+ * @internal
+ * @ignore
+ */
 function generateLayerRendererMethod(_oldRender: any)
 {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    return function render(displayObject: DisplayObject, options: any, arg1: any, arg2: any, arg3: any)
+    return function render(displayObject: IRenderableObject, options: any, arg1?: any, arg2?: any, arg3?: any)
     {
         if (!options || (!options.renderTexture && !options.baseTexture))
         {
             this._lastDisplayOrder = 0;
         }
         this._activeLayer = null;
+
         if ((displayObject as Stage).isStage)
         {
             (displayObject as Stage).updateStage();
@@ -32,21 +46,27 @@ function generateLayerRendererMethod(_oldRender: any)
         {
             this.plugins.interaction.search = new LayersTreeSearch();
         }
+
         _oldRender.call(this, displayObject, options, arg1, arg2, arg3);
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-export function applyRendererMixin(rendererClass: any)
+/**
+ * Mixes {@link ILayeredRenderer} into {@link PIXI.Renderer}.
+ *
+ * This is automatically done on importing @pixi/layers.
+ */
+export function applyRendererMixin(rendererClass: typeof Renderer)
 {
-    const RendererProto = rendererClass.prototype;
+    const RendererProto = rendererClass.prototype as (Renderer & Partial<ILayeredRenderer>);
 
+    // Skip if mixin already applied.
     if (RendererProto._oldRender)
     {
         return;
     }
 
-    (Object as any).assign(RendererProto, {
+    Object.assign(RendererProto, {
         _lastDisplayOrder: 0,
         _activeLayer: null,
         incDisplayOrder()
@@ -60,7 +80,17 @@ export function applyRendererMixin(rendererClass: any)
     RendererProto.render = generateLayerRendererMethod(RendererProto.render);
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+/**
+ * Mixes renderer mixin + container mixin for canvas.
+ *
+ * If you are using PixiJS' canvas renderer, you'll need to invoke this manually.
+ *
+ * @example
+ * import { CanvasRenderer } from '@pixi/canvas-renderer';
+ * import { applyCanvasMixin } from '@pixi/layers';
+ *
+ * applyCanvasMixin(CanvasRenderer);
+ */
 export function applyCanvasMixin(canvasRenderClass: any): void
 {
     if (!canvasRenderClass)
@@ -79,6 +109,7 @@ export function applyCanvasMixin(canvasRenderClass: any): void
     {
         return;
     }
+
     ContainerProto.containerRenderCanvas = ContainerProto.renderCanvas;
     ContainerProto.renderCanvas = generateLayerContainerRenderMethod(ContainerProto.renderCanvas);
 }
