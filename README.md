@@ -26,9 +26,9 @@ If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or j
 
 * [Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
 * [Z-order example](https://pixijs.io/examples/#/plugin-layers/zorder.js)
+* [Double buffering](http://pixijs.github.io/examples/#/layers/trail.js)
 * [Normals example - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
 * [Normals with sorting - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
-* [Double buffering - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/trail.js)
 
 ## Usage
 
