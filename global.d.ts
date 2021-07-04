@@ -1,6 +1,7 @@
 declare namespace GlobalMixins {
     export interface Container {
         containerRenderWebGL?(renderer: import('@pixi/core').Renderer): void;
+        containerRenderCanvas?(renderer: import('@pixi/layers').ILayeredRenderer): void;
     }
 
     export interface DisplayObject {

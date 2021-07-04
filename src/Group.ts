@@ -1,60 +1,68 @@
-/**
- * A shared component for multiple DisplayObject's allows to specify rendering order for them
- *
- * @class
- * @extends EventEmitter
- * @memberof PIXI
- * @param zIndex {number} z-index for display group
- * @param sorting {boolean | Function} if you need to sort elements inside, please provide function that will set displayObject.zOrder accordingly
- */
-
-import { DisplayObject } from '@pixi/display';
 import * as utils from '@pixi/utils';
+
+import type { DisplayObject } from '@pixi/display';
 import type { Layer } from './Layer';
 import type { Stage } from './Stage';
 
+/**
+ * A context for z-ordering {@link PIXI.DisplayObject}s within the same {@link Layer}.
+ *
+ * You can
+ */
 export class Group extends utils.EventEmitter
 {
     static _layerUpdateId = 0;
 
-    _activeLayer: Layer = null;
+    /** See {@link Layer#useRenderTexture} */
+    public useRenderTexture = false;
 
-    _activeStage: Stage = null;
+    /** See {@link Layer#useDoubleBuffer} */
+    public useDoubleBuffer = false;
 
-    _activeChildren: Array<DisplayObject> = [];
+    /**
+     * Groups with a non-zero sort priority are sorted first.
+     *
+     * Unsure of the exact purpose yet :)
+     */
+    public sortPriority = 0;
 
-    _lastUpdateId = -1;
-
-    useRenderTexture = false;
-    useDoubleBuffer = false;
-    sortPriority = 0;
-    clearColor : ArrayLike<number> = new Float32Array([0, 0, 0, 0]);
+    /** See {@link Layer#clearColor} */
+    public clearColor : ArrayLike<number> = new Float32Array([0, 0, 0, 0]);
 
     // TODO: handle orphan groups
     // TODO: handle groups that don't want to be drawn in parent
     canDrawWithoutLayer = false;
     canDrawInParentStage = true;
 
+    /** Default zIndex value for layers that are created with this Group */
+    public zIndex: number;
+
+    /** Enabling sorting objects within this group by {@link PIXI.DisplayObject#zIndex zIndex}. */
+    public enableSort: boolean;
+
+    private _activeLayer: Layer = null;
+    private _activeStage: Stage = null;
+    /** @private */
+    _activeChildren: Array<DisplayObject> = [];
+    private _lastUpdateId = -1;
+
     /**
-     * default zIndex value for layers that are created with this Group
-     * @type {number}
+     * @param zIndex - The z-index for the entire group.
+     * @param sorting - This will enable sorting by z-order. You can also pass a callback that will assign
+     *  the z-index _before_ sorting. This is useful, for example, when you want to sort by "y" - the callback
+     *  can then set the {@link PIXI.DisplayObject#zOrder zOrder} to the y-coordinate. This callback is invoked
+     *  as an event-listener to the {@link Group#sort} event.
      */
-    zIndex = 0;
-
-    enableSort = false;
-
-    // eslint-disable-next-line @typescript-eslint/ban-types
-    constructor(zIndex: number, sorting: boolean | Function)
+    constructor(zIndex: number, sorting: boolean | ((displayObject: DisplayObject) => void))
     {
         super();
 
-        this.zIndex = zIndex;
-
+        this.zIndex = zIndex || 0;
         this.enableSort = !!sorting;
 
         if (typeof sorting === 'function')
         {
-            this.on('sort', sorting as any);
+            this.on('sort', sorting);
         }
     }
 
@@ -71,8 +79,7 @@ export class Group extends utils.EventEmitter
         sorted.sort(Group.compareZIndex);
     }
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    static compareZIndex(a: DisplayObject, b: DisplayObject)
+    private static compareZIndex(a: DisplayObject, b: DisplayObject): number
     {
         if (a.zOrder < b.zOrder)
         {
@@ -89,7 +96,7 @@ export class Group extends utils.EventEmitter
     /**
      * clears temporary variables
      */
-    clear(): void
+    private clear(): void
     {
         this._activeLayer = null;
         this._activeStage = null;
@@ -97,12 +104,17 @@ export class Group extends utils.EventEmitter
     }
 
     /**
-     * used only by displayList before sorting takes place
+     * Resolve a child {@link PIXI.DisplayObject} that is set to be in this group.
+     *
+     * This is an **internal** method.
+     *
+     * @see Stage#updateStage
      */
-    addDisplayObject(stage: Stage, displayObject: DisplayObject): void
+    _resolveChildDisplayObject(stage: Stage, displayObject: DisplayObject): void
     {
         this.check(stage);
         displayObject._activeParentLayer = this._activeLayer;
+
         if (this._activeLayer)
         {
             this._activeLayer._activeChildren.push(displayObject);
@@ -114,36 +126,26 @@ export class Group extends utils.EventEmitter
     }
 
     /**
-     * called when corresponding layer is found in current stage
-     * @param stage
-     * @param layer
+     * Resolve the layer rendering this group of {@link DisplayObject display objects}.
+     *
+     * This is an **internal** method.
+     *
+     * @see Layer#_onBeginLayerSubtreeTraversal
      */
-    foundLayer(stage: Stage, layer: Layer): void
+    _resolveLayer(stage: Stage, layer: Layer): void
     {
         this.check(stage);
-        // eslint-disable-next-line eqeqeq,no-eq-null
-        if (this._activeLayer != null)
+
+        if (this._activeLayer)
         {
             Group.conflict();
         }
+
         this._activeLayer = layer;
         this._activeStage = stage;
     }
 
-    /**
-     * called after stage finished the work
-     * @param stage
-     */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    foundStage(stage: Stage): void
-    {
-        if (!this._activeLayer && !this.canDrawInParentStage)
-        {
-            this.clear();
-        }
-    }
-
-    check(stage: Stage): void
+    private check(stage: Stage): void
     {
         if (this._lastUpdateId < Group._layerUpdateId)
         {
@@ -167,16 +169,23 @@ export class Group extends utils.EventEmitter
         }
     }
 
-    static _lastLayerConflict = 0;
+    private static _lastLayerConflict = 0;
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    static conflict()
+    /** Log a conflict that occurs when multiple layers render the same group. */
+    private static conflict(): void
     {
         if (Group._lastLayerConflict + 5000 < Date.now())
         {
             Group._lastLayerConflict = Date.now();
             // eslint-disable-next-line max-len,no-console
-            console.log(`PIXI-display plugin found two layers with the same group in one stage - that's not healthy. Please place a breakpoint here and debug it`);
+            console.log(`@pixi/layers found two layers with the same group in one stage - that's not healthy. Please place a breakpoint here and debug it`);
         }
     }
+
+    /**
+     * Fired for each {@link DisplayObject} in this group, right before they are sorted.
+     *
+     * @event sort
+     * @param {PIXI.DisplayObject} object - The object that will be sorted.
+     */
 }

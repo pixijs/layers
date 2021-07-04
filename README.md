@@ -1,10 +1,18 @@
-# @pixi/layers
+# @pixi/layers - PixiJS Layers Kit
 
-Allows to change rendering order of pixi containers without changing the scene graph.
+This package provides an extension to scene tree - layers. These layers allows you to change
+the rendering order of items in your scene without moving them around in your scene. It's like
+{@link PIXI.DisplayObject#zIndex zIndex}, but supercharged.
 
-Works with pixi-v6.
+It has been ported to PixiJS 6 since @pixi/layers 1.0.0 (formerly pixi-layers).
 
 **Nothing will work if you dont create Stage and set it as root. Please do it or read full explanation.**
+
+## Installation
+
+```bash
+npm install --save @pixi/layers
+```
 
 ### Migration from v5
 
@@ -14,19 +22,15 @@ If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or j
 
 ## Examples
 
-[Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
+* [Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
+* [Z-order example](https://pixijs.io/examples/#/plugin-layers/zorder.js)
+* [Normals example - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
+* [Normals with sorting - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
+* [Double buffering - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/trail.js)
 
-[Z-order example](https://pixijs.io/examples/#/plugin-layers/zorder.js)
+## Usage
 
-[Normals example - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
-
-[Normals with sorting - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
-
-[Double buffering - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/trail.js)
-
-## Some explanations
-
-Layer extends Container
+{@link Layer} extends {@link PIXI.Container}:
 
 ```js
 import { Layer } from '@pixi/layers'
@@ -34,7 +38,7 @@ import { Layer } from '@pixi/layers'
 let layer = new Layer();
 ```
 
-Pixi DisplayObject/Container can be rendered inside its layer instead of direct parent
+A DisplayObject/Container can be rendered inside its layer instead of direct parent
 
 ```js
 bunnySprite.parentLayer = layer;
@@ -53,33 +57,31 @@ You can check which objects were picked up into layer
 
 ```js
 stage.updateStage();
-console.log(layer.displayChildren);
+console.log(layer._sortedChildren);
 
-//order of rendering: 
-// bunnySprite (index=1)
-// badCloudSprite (index=2, order=1)
-// cloudSprite (index=2, order=0)
+// Order of rendering: 
+//   bunnySprite (index=1)
+//   badCloudSprite (index=2, order=1)
+//   cloudSprite (index=2, order=0)
 ```
 
-updateStage calls onSort, you can override it
+{@link Group} sorts its items after emitting the {@link Group#sort} event for each item. You
+can intercept it and set the z-order on each item.
 
 ```js
-layer.group.on('sort', function(sprite) { sprite.zOrder = sprite.y })
+layer.group.on('sort', function onWillSort(sprite) {
+    sprite.zOrder = sprite.y 
+});
 ```
 
-Renderer will call "updateStage" automatically, so you can check it after render too
+@pixi/layer applies a mixin on {@link PIXI.Renderer} so it calls "updateStage" automatically if you use a {@link Stage}
+for your scene's root, so you can check it after render too:
 
 ```js
 renderer.render(stage);
-console.log(layer.displayChildren);
+console.log(layer._sortedChildren);
 ```
 
-Layer bounds take displayChildren into account, unless you switch that flag to false
-
-```
-layer.respectDisplayChildrenBounds = true; // its actually true by default
-console.log(layer.getBounds()); // takes displayChildren bounds into account
-```
 
 When you move a character with attached sprites from different layers to a new stage, you have to change their layers.
 
