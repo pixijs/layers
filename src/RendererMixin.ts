@@ -12,7 +12,7 @@ import type { Layer } from './Layer';
 export interface ILayeredRenderer
 {
     /** Order/index of last rendered object */
-    _lastDisplayOrder: 0;
+    _lastDisplayOrder: number;
 
     /** {@link Layer} currently being rendered */
     _activeLayer: Layer;
