@@ -35,7 +35,8 @@ export function generateLayerContainerRenderMethod(originalRender: any)
 
 // special case - container render method, because we want it to be faster
 /**
- * webdoc won't ignore this?
+ * @internal
+ * @private
  * @ignore
  */
 function containerRender(renderer: any): void
