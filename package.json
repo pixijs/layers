@@ -37,6 +37,7 @@
     "postpublish": "git push && git push --tags",
     "prepack": "clean-package",
     "postpack": "clean-package restore",
+    "docs": "typedoc --out ./docs/ --readme README.md ./src/",
     "unit-test": "floss --path test --"
   },
   "publishConfig": {
