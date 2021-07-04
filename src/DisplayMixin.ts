@@ -33,8 +33,8 @@ export function generateLayerContainerRenderMethod(originalRender: any)
     };
 }
 
-/** @ignore */
 // special case - container render method, because we want it to be faster
+/** @ignore */
 function containerRender(renderer: any): void
 {
     if (this._activeParentLayer && this._activeParentLayer !== renderer._activeLayer)
