@@ -17,7 +17,7 @@ export interface ILayeredRenderer
     /** {@link Layer} currently being rendered */
     _activeLayer: Layer;
 
-    /** **Internal** method for updating {@link ILayeredRenderer#_lastDisplayOrder _lastDisplayOrder} */
+    /** **Internal** method for updating {@link ILayeredRenderer#_lastDisplayOrder} */
     incDisplayOrder(): number;
 
     /** **Internal** reference to old render method */
