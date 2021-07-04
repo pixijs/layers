@@ -17,7 +17,10 @@ export interface ILayeredRenderer
     _oldRender(displayObject: IRenderableObject, options?: IRendererRenderOptions): void;
 }
 
-/** @internal */
+/**
+ * @internal
+ * @ignore
+ */
 function generateLayerRendererMethod(_oldRender: any)
 {
     return function render(displayObject: IRenderableObject, options: any, arg1?: any, arg2?: any, arg3?: any)
