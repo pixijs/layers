@@ -1,5 +1,7 @@
 # @pixi/layers - PixiJS Layers Kit
 
+[![Build](https://github.com/pixijs/layers/workflows/Build/badge.svg)](https://github.com/pixijs/layers/actions?query=workflow%3A%22Build%22) [![npm version](https://badge.fury.io/js/%40pixi%2Flayers.svg)](https://badge.fury.io/js/%40pixi%2Flayers)
+
 This package provides an extension to scene tree - layers. These layers allows you to change
 the rendering order of items in your scene without moving them around in your scene. It's like
 {@link PIXI.DisplayObject#zIndex zIndex}, but supercharged.
@@ -18,7 +20,7 @@ npm install --save @pixi/layers
 
 See [usage with canvas and particles](#usage-with-canvas-and-particles) part of this doc.
 
-If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or just use npm package `pixi-picture`
+If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or just use npm package `pixi-layers`
 
 ## Examples
 
@@ -178,7 +180,6 @@ It happens.
 ## How to build
 
 ```bash
-pnpm install
-pnpm run build
+npm install
+npm run build
 ```
-

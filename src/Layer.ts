@@ -26,6 +26,7 @@ export class LayerTextureCache
     private currentBufferIndex = 0;
     _tempRenderTarget: RenderTexture = null;
     _tempRenderTargetSource = new Rectangle();
+    _tempRenderTargetDestination = new Rectangle();
 
     private init(renderer?: Renderer): void
     {
@@ -94,6 +95,7 @@ export class LayerTextureCache
 
         this._tempRenderTarget = renderer.renderTexture.current;
         this._tempRenderTargetSource.copyFrom(renderer.renderTexture.sourceFrame);
+        this._tempRenderTargetDestination.copyFrom(renderer.renderTexture.destinationFrame);
 
         renderer.batch.flush();
 
@@ -150,7 +152,8 @@ export class LayerTextureCache
         {
             filterStack[filterStack.length - 1].renderTexture = this._tempRenderTarget;
         }
-        renderer.renderTexture.bind(this._tempRenderTarget, this._tempRenderTargetSource, undefined);
+        renderer.renderTexture.bind(this._tempRenderTarget,
+            this._tempRenderTargetSource, this._tempRenderTargetDestination);
         this._tempRenderTarget = null;
 
         const rt = this.renderTexture;

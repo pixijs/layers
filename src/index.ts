@@ -35,10 +35,11 @@ applyRendererMixin(Renderer);
  */
 
 /**
- * Objects in a {@link Group group} are sorted by z-order. This can be used alongside PixiJS' built-in {@link PIXI.DisplayObject#zIndex zIndex}.
+ * Objects in a {@link Group group} are sorted by z-order.
+ * This can be used alongside PixiJS' built-in {@link PIXI.DisplayObject#zIndex zIndex}.
  *
- * If you use both {@code zIndex} and {@code zOrder}, objects will first be sorted by z-index and then @pixi/layers will
- * sort by z-order.
+ * If you use both {@code zIndex} and {@code zOrder}, objects will first be sorted by z-index
+ * and then @pixi/layers will sort by z-order.
  *
  * This is provided by **@pixi/layers**.
  *

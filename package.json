@@ -19,19 +19,42 @@
     "url": "https://github.com/pixijs/pixi-layers.git"
   },
   "scripts": {
-    "cleanup": "rimraf dist && mkdirp dist && rimraf lib && mkdirp lib && rimraf compile",
-    "prestart": "pnpm run cleanup",
-    "start": "parallelshell \"pnpm run watch\"",
-    "watch": "tsc -w",
-    "prebuild": "pnpm run cleanup",
-    "build": "rollup -c scripts/rollup.config.js && pnpm run build:types",
-    "build:types": "rimraf ./compile && tsc -p ./tsconfig.compile.json && api-extractor run && node scripts/injectGlobalMixins",
-    "docs": "typedoc --out ./docs/ --readme README.md ./src/",
+    "clean": "rimraf dist/* lib/* compile",
+    "start": "run-s watch",
+    "watch": "rollup -cw scripts/rollup.config.js",
+    "prebuild": "run-s clean lint types",
+    "build": "rollup -c scripts/rollup.config.js",
+    "postbuild": "run-s build:types",
+    "build:prod": "cross-env NODE_ENV=production run-s build",
+    "prebuild:types": "rimraf compile",
+    "build:types": "tsc --outDir compile --declaration && api-extractor run && node scripts/injectGlobalMixins",
     "lint": "eslint ./src",
+    "types": "tsc -noEmit",
+    "release:patch": "npm version patch && npm publish",
+    "release:minor": "npm version minor && npm publish",
+    "release:major": "npm version major && npm publish",
+    "postversion": "run-s build:prod",
+    "postpublish": "git push && git push --tags",
+    "prepack": "clean-package",
+    "postpack": "clean-package restore",
     "unit-test": "floss --path test --"
   },
   "publishConfig": {
     "access": "public"
+  },
+  "engines": {
+    "node": ">=14",
+    "npm": ">=7"
+  },
+  "clean-package": {
+    "indent": 2,
+    "remove": [
+      "clean-package",
+      "scripts",
+      "engines",
+      "devDependencies",
+      "eslintConfig"
+    ]
   },
   "files": [
     "dist/",
@@ -52,7 +75,7 @@
     "@pixi/utils": "^6.0.4"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.15.2",
+    "@microsoft/api-extractor": "^7.17.1",
     "@pixi-build-tools/rollup-configurator": "~1.0.11",
     "@pixi/canvas-renderer": "^6.0.4",
     "@pixi/constants": "^6.0.4",
@@ -67,14 +90,15 @@
     "@types/eventemitter3": "^2.0.2",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
+    "clean-package": "^1.0.1",
     "chai": "^4.3.3",
     "del": "^2.2.0",
     "electron": "^9.4.0",
     "eslint": "^7.21.0",
+    "npm-run-all": "^4.1.5",
     "floss": "^3.0.0",
     "jsdoc": "^3.4.0",
     "mkdirp": "^0.5.1",
-    "parallelshell": "^2.0.0",
     "prepend": "=1.0.2",
     "relative-deps": "^1.0.6",
     "rimraf": "^2.5.3",

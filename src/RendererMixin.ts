@@ -56,7 +56,7 @@ function generateLayerRendererMethod(_oldRender: any)
  *
  * This is automatically done on importing @pixi/layers.
  */
-export function applyRendererMixin(rendererClass: typeof Renderer)
+export function applyRendererMixin(rendererClass: typeof Renderer): void
 {
     const RendererProto = rendererClass.prototype as (Renderer & Partial<ILayeredRenderer>);
 
@@ -91,6 +91,7 @@ export function applyRendererMixin(rendererClass: typeof Renderer)
  *
  * applyCanvasMixin(CanvasRenderer);
  */
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function applyCanvasMixin(canvasRenderClass: any): void
 {
     if (!canvasRenderClass)

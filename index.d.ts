@@ -46,7 +46,7 @@ export declare class Group extends utils.EventEmitter {
 }
 
 export declare interface ILayeredRenderer {
-    _lastDisplayOrder: 0;
+    _lastDisplayOrder: number;
     _activeLayer: Layer;
     incDisplayOrder(): number;
     _oldRender(displayObject: IRenderableObject, options?: IRendererRenderOptions): void;
@@ -91,6 +91,7 @@ export declare class LayerTextureCache {
     private currentBufferIndex;
     _tempRenderTarget: RenderTexture;
     _tempRenderTargetSource: Rectangle;
+    _tempRenderTargetDestination: Rectangle;
     private init;
     getRenderTexture(): RenderTexture;
     pushTexture(renderer: Renderer): void;
