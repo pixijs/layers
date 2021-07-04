@@ -34,7 +34,10 @@ export function generateLayerContainerRenderMethod(originalRender: any)
 }
 
 // special case - container render method, because we want it to be faster
-/** @ignore */
+/**
+ * webdoc won't ignore this?
+ * @ignore
+ */
 function containerRender(renderer: any): void
 {
     if (this._activeParentLayer && this._activeParentLayer !== renderer._activeLayer)
