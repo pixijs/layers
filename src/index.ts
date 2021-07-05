@@ -21,7 +21,8 @@ applyRendererMixin(Renderer);
  * This is provided by **@pixi/layers**.
  *
  * @memberof PIXI.DisplayObject
- * @member parentGroup
+ * @member {Group}
+ * @name parentGroup
  */
 
 /**
@@ -31,7 +32,8 @@ applyRendererMixin(Renderer);
  * This is provided by **@pixi/layers**.
  *
  * @memberof PIXI.DisplayObject
- * @member parentLayer
+ * @member {Layer}
+ * @name parentLayer
  */
 
 /**
@@ -44,5 +46,6 @@ applyRendererMixin(Renderer);
  * This is provided by **@pixi/layers**.
  *
  * @memberof PIXI.DisplayObject
- * @member zOrder
+ * @member {number}
+ * @name zOrder
  */
