@@ -51,7 +51,7 @@ export class Group extends utils.EventEmitter
      *  can then set the {@link PIXI.DisplayObject#zOrder zOrder} to the y-coordinate. This callback is invoked
      *  as an event-listener to the {@link Group#sort} event.
      */
-    constructor(zIndex: number, sorting: boolean | ((displayObject: DisplayObject) => void))
+    constructor(zIndex = 0, sorting: boolean | ((displayObject: DisplayObject) => void) = false)
     {
         super();
 
