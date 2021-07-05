@@ -117,6 +117,7 @@ export class Stage extends Layer
             return;
         }
 
+        displayObject._activeParentLayer = null;
         let group = displayObject.parentGroup;
 
         if (group)
