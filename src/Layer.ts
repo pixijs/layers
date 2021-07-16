@@ -352,8 +352,8 @@ export class Layer extends Container
         }
     }
 
-    /** @override */
-    public renderCanvas(renderer: ILayeredRenderer): void
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    public renderCanvas(renderer: any): void
     {
         if (this.prerender(renderer))
         {
