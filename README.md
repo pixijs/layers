@@ -145,16 +145,18 @@ please set the group `sortPriority`. For now, it has two values - 0 by default a
 
 Look at [Normals with sorting](http://pixijs.github.io/examples/#/layers/normals.js)
 
-## Important notice about filters and masks
+## Important notice about filters
 
-If you try apply `layer.mask = mySpriteMask`, or if you add filters to the layer - it might not work right!
+If you add filters to layer, or use layer itself as a mask - it might not work!
 
 The reason is that layer `getBounds()` does not take into account its active children.
 
-Several ways to solve that:
+If you use filters on layer, there are three ways:
 1. add a filterArea, its global screen rect for filters, `layer.filterArea = renderer.screen`.
-2. add a child graphics rect of certain size with alpha=0
-3. override `calculateBounds` that way it takes `_activeChildren` into account.
+2. works with both: Add a child graphics rect of certain size with alpha=0
+3. if you know how to pixi: override `calculateBounds` that way it takes `_activeChildren` into account.
+
+If you use layer as a stencil mask (render all graphics inside it, only ways 2 and 3 can work.
 
 ## The legend
 
