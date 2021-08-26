@@ -91,7 +91,9 @@ export function applyDisplayMixin(): void
     ContainerProto.render = containerRender;
 }
 
-/** Apply mixin to your custom Container class (not needed if using built-in {@link PIXI.Container}) */
+/** Apply mixin to your custom Container class (not needed if using built-in {@link PIXI.Container})
+ * Call it for `myClass.prototype`, not for `myClass` !
+ * */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function applyContainerRenderMixin(CustomRenderContainer: any): void
 {
@@ -115,5 +117,5 @@ export function applyContainerRenderMixin(CustomRenderContainer: any): void
 export function applyParticleMixin(ParticleContainer: any): void
 {
     ParticleContainer.prototype.layerableChildren = false;
-    applyContainerRenderMixin(ParticleContainer);
+    applyContainerRenderMixin(ParticleContainer.prototype);
 }

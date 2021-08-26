@@ -145,6 +145,17 @@ please set the group `sortPriority`. For now, it has two values - 0 by default a
 
 Look at [Normals with sorting](http://pixijs.github.io/examples/#/layers/normals.js)
 
+## Important notice about filters and masks
+
+If you try apply `layer.mask = mySpriteMask`, or if you add filters to the layer - it might not work right!
+
+The reason is that layer `getBounds()` does not take into account its active children.
+
+Several ways to solve that:
+1. add a filterArea, its global screen rect for filters, `layer.filterArea = renderer.screen`.
+2. add a child graphics rect of certain size with alpha=0
+3. override `calculateBounds` that way it takes `_activeChildren` into account.
+
 ## The legend
 
 Stage is the city. Containers are buildings, simple sprites are people.

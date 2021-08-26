@@ -34,7 +34,7 @@ export declare class Group extends utils.EventEmitter {
     private _activeStage;
     _activeChildren: Array<DisplayObject>;
     private _lastUpdateId;
-    constructor(zIndex: number, sorting: boolean | ((displayObject: DisplayObject) => void));
+    constructor(zIndex?: number, sorting?: boolean | ((displayObject: DisplayObject) => void));
     doSort(layer: Layer, sorted: Array<DisplayObject>): void;
     private static compareZIndex;
     private clear;
@@ -76,7 +76,7 @@ export declare class Layer extends Container {
     doSort(): void;
     destroy(options?: IDestroyOptions): void;
     render(renderer: Renderer): void;
-    renderCanvas(renderer: ILayeredRenderer): void;
+    renderCanvas(renderer: any): void;
     _onBeginLayerSubtreeTraversal(stage: Stage): void;
     _onEndLayerSubtreeTraversal(): void;
     protected prerender(renderer: ILayeredRenderer): boolean;
