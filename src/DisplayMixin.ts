@@ -115,5 +115,5 @@ export function applyContainerRenderMixin(CustomRenderContainer: any): void
 export function applyParticleMixin(ParticleContainer: any): void
 {
     ParticleContainer.prototype.layerableChildren = false;
-    this.applyRenderMixing(ParticleContainer);
+    applyContainerRenderMixin(ParticleContainer);
 }
