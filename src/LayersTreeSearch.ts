@@ -178,7 +178,10 @@ export class LayersTreeSearch
 
         for (let i = 0, l = q.length; i < l; i++)
         {
-            func(event, q[i], false);
+            if (func)
+            {
+                func(event, q[i], false);
+            }
         }
         q = queue[1];
         for (let i = 0, l = q.length; i < l; i++)
