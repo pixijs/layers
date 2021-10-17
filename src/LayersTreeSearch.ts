@@ -38,7 +38,7 @@ export class LayersTreeSearch
 
         if (hitTestOrder < Infinity && mask)
         {
-            if (!mask.containsPoint(point))
+            if (mask.containsPoint && !mask.containsPoint(point))
             {
                 outOfMask = true;
             }

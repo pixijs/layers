@@ -46,8 +46,6 @@ declare namespace GlobalMixins {
          * is Layer
          */
         isLayer?: boolean;
-
-        containsPoint?(p: import('@pixi/math').IPoint): boolean;
     }
 
     // need TextureSystem in pixi mixins
