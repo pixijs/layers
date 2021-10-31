@@ -352,8 +352,12 @@ export class Layer extends Container
         }
     }
 
+    /**
+     * renderCanvas named this way because of some TS mixin problem
+     * @param renderer
+     */
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    public renderCanvas(renderer: any): void
+    public layerRenderCanvas(renderer: any): void
     {
         if (this.prerender(renderer))
         {
@@ -501,3 +505,5 @@ export class Layer extends Container
         this._tempLayerParent = null;
     }
 }
+
+(Layer.prototype as any).renderCanvas = Layer.prototype.layerRenderCanvas;
