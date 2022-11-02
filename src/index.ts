@@ -2,15 +2,17 @@
 /// <reference path="../global.d.ts" />
 
 import { applyDisplayMixin, applyContainerRenderMixin, applyParticleMixin } from './DisplayMixin';
-import { applyRendererMixin, applyCanvasMixin, ILayeredRenderer } from './RendererMixin';
+import { applyRendererMixin, applyCanvasMixin } from './RendererMixin';
 import { Renderer } from '@pixi/core';
+
+import type { ILayeredRenderer } from './RendererMixin';
 
 export * from './Stage';
 export * from './Layer';
 export * from './Group';
 
 export { applyDisplayMixin, applyCanvasMixin, applyContainerRenderMixin, applyRendererMixin, applyParticleMixin };
-export { ILayeredRenderer };
+export type { ILayeredRenderer };
 
 applyDisplayMixin();
 applyRendererMixin(Renderer);

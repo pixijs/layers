@@ -9,7 +9,7 @@ import type { Layer } from './Layer';
 /**
  * Mixin applied on {@link PIXI.Renderer} when using @pixi/layers.
  */
-export interface ILayeredRenderer
+interface ILayeredRenderer
 {
     /** Order/index of last rendered object */
     _lastDisplayOrder: number;
@@ -23,6 +23,8 @@ export interface ILayeredRenderer
     /** **Internal** reference to old render method */
     _oldRender(displayObject: IRenderableObject, options?: IRendererRenderOptions): void;
 }
+
+export type { ILayeredRenderer };
 
 /**
  * @internal

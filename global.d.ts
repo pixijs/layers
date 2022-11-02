@@ -4,6 +4,10 @@ declare namespace GlobalMixins {
         containerRenderCanvas?(renderer: import('@pixi/layers').ILayeredRenderer): void;
     }
 
+    export interface DisplayObjectEvents {
+        display: [import('@pixi/display').DisplayObject];
+    }
+
     export interface DisplayObject {
         parentGroup?: import('@pixi/layers').Group,
 

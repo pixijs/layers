@@ -4,9 +4,7 @@
 
 import { Container } from '@pixi/display';
 import { Group } from './Group';
-import { RenderTexture, Renderer } from '@pixi/core';
-import { Rectangle } from '@pixi/math';
-import { settings } from '@pixi/settings';
+import { settings, Rectangle, RenderTexture, Renderer } from '@pixi/core';
 
 import type { DisplayObject, IDestroyOptions } from '@pixi/display';
 import type { Stage } from './Stage';

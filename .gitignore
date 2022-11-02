@@ -28,7 +28,6 @@ docs/
 .idea
 
 # tsc output
-compile
 dist
 lib
 index.d.ts

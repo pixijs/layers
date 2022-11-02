@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "ES2020",
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
@@ -21,6 +21,7 @@
     ],
     "exclude": [
         "node_modules/**/*",
-        "dist"
+        "dist",
+        "lib"
     ]
 }

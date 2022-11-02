@@ -1,4 +1,4 @@
-import * as utils from '@pixi/utils';
+import { utils } from '@pixi/core';
 
 import type { DisplayObject } from '@pixi/display';
 import type { Layer } from './Layer';

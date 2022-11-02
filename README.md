@@ -111,7 +111,7 @@ Navigate `pixi-layers` npm package, take `dist/pixi-layers.umd.js` file.
 ```
 
 ```js
-let layer = new PIXI.display.Layer();
+let layer = new PIXI.layers.Layer();
 ```
 
 ## Usage with canvas and particles
