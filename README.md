@@ -1,6 +1,6 @@
 # @pixi/layers - PixiJS Layers Kit
 
-[![Build](https://github.com/pixijs/layers/workflows/Build/badge.svg)](https://github.com/pixijs/layers/actions?query=workflow%3A%22Build%22) [![npm version](https://badge.fury.io/js/%40pixi%2Flayers.svg)](https://badge.fury.io/js/%40pixi%2Flayers)
+[![Build CI](https://github.com/pixijs/layers/actions/workflows/build.yml/badge.svg)](https://github.com/pixijs/layers/actions/workflows/build.yml) [![npm version](https://badge.fury.io/js/%40pixi%2Flayers.svg)](https://badge.fury.io/js/%40pixi%2Flayers)
 
 This package provides an extension to scene tree - layers. These layers allows you to change
 the rendering order of items in your scene without moving them around in your scene. It's like
@@ -18,11 +18,10 @@ npm install --save @pixi/layers
 
 ## Examples
 
-* [Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
-* [Z-order example](https://pixijs.io/examples/#/plugin-layers/zorder.js)
-* [Double buffering](https://pixijs.io/examples/#/plugin-layers/trail.js)
-* [Normals example](https://pixijs.io/examples/#/plugin-layers/normals.js)
-* [Normals with sorting](https://pixijs.io/examples/#/plugin-layers/normals-drag.js)
+* [Blend Modes example](https://pixijs.io/layers/examples/blend-modes.html)
+* [Z-order example](https://pixijs.io/layers/examples/z-order.html)
+* [Double buffering](https://pixijs.io/layers/examples/trail.html)
+* [Bring To Top](https://pixijs.io/layers/examples/bring-to-top.html)
 
 ## Usage
 
