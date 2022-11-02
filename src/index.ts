@@ -17,12 +17,11 @@ export type { ILayeredRenderer };
 applyDisplayMixin();
 applyRendererMixin(Renderer);
 
-/** 
+/**
  * @namespace PIXI.layers
  */
 
-
-/** 
+/**
  * @namespace PIXI
  */
 
