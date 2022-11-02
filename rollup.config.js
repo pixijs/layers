@@ -52,7 +52,10 @@ export default [
         ],
     },
     {
-        plugins: [esbuild({ target: 'ES2017' })],
+        plugins: [esbuild({
+            target: 'ES2017',
+            minify: true,
+        })],
         external,
         input: pkg.source,
         treeshake: false,
@@ -60,27 +63,6 @@ export default [
             {
                 banner,
                 file: pkg.bundle,
-                format: 'iife',
-                name: pkg.namespace,
-                sourcemap: true,
-                globals,
-            }
-        ],
-    },
-    {
-        plugins: [
-            esbuild({
-                target: 'ES2017',
-                minify: true,
-            }
-        )],
-        external,
-        input: pkg.source,
-        treeshake: false,
-        output: [
-            {
-                banner,
-                file: pkg.bundle.replace(/\.js$/, '.min.js'),
                 format: 'iife',
                 name: pkg.namespace,
                 sourcemap: true,
