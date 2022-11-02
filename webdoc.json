@@ -21,12 +21,12 @@
     "default": {
       "outputSourceFiles": false
     },
-    "applicationName": "PixiJS Lights",
-    "copyright": "PIXI Copyright &copy; 2015 - 2022 Ivan Popelyshev",
+    "applicationName": "PixiJS Layers",
+    "copyright": "Copyright &copy; 2015 - 2022 Ivan Popelyshev",
     "linenums": false,
     "meta": {
-      "title": "PixiJS Lights API Documentation",
-      "description": "Documentation for PixiJS Lights library",
+      "title": "PixiJS Layers API Documentation",
+      "description": "Documentation for PixiJS Layers library",
       "keyword": "docs, documentation, pixi, pixijs, rendering, pixi-layers, display, pixi-display, javascript, jsdoc"
     }
   },
