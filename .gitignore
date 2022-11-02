@@ -31,3 +31,6 @@ docs/
 dist
 lib
 index.d.ts
+
+# webdoc
+example.api.json*

@@ -5,7 +5,7 @@ import { Group } from './Group';
 /**
  * The {@link Stage stage} manages all the layers in its scene tree.
  *
- *
+ * @memberof PIXI.layers
  */
 export class Stage extends Layer
 {
@@ -18,6 +18,7 @@ export class Stage extends Layer
 
     /**
      * Found layers
+     * @private
      */
     _activeLayers: Array<Layer> = [];
 

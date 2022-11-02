@@ -46,7 +46,8 @@
     "postpublish": "git push && git push --tags",
     "prepack": "clean-package",
     "postpack": "clean-package restore",
-    "docs": "typedoc --out ./docs/ --readme README.md ./src/"
+    "predocs": "rimraf docs/**",
+    "docs": "webdoc -c webdoc.json -r README.md"
   },
   "publishConfig": {
     "access": "public"
@@ -90,6 +91,8 @@
     "@pixi/core": "^7.0.0",
     "@pixi/display": "^7.0.0",
     "@pixi/eslint-config": "^4.0.1",
+    "@pixi/webdoc-template": "^1.5.4",
+    "@webdoc/cli": "^2.2.0",
     "clean-package": "^1.0.1",
     "eslint": "^7.21.0",
     "http-server": "^14.1.1",
