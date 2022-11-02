@@ -43,11 +43,13 @@
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
     "postversion": "run-s build",
-    "postpublish": "git push && git push --tags",
+    "postpublish": "run-s deploy && git push && git push --tags",
     "prepack": "clean-package",
     "postpack": "clean-package restore",
     "predocs": "rimraf docs/**",
-    "docs": "webdoc -c webdoc.json -r README.md"
+    "docs": "webdoc -c webdoc.json -r README.md",
+    "predeploy": "run-s docs",
+    "deploy": "gh-pages -d . -s \"{dist,examples,docs}/**\" -f"
   },
   "publishConfig": {
     "access": "public"
@@ -95,6 +97,7 @@
     "@webdoc/cli": "^2.2.0",
     "clean-package": "^1.0.1",
     "eslint": "^7.21.0",
+    "gh-pages": "^4.0.0",
     "http-server": "^14.1.1",
     "npm-run-all": "^4.1.5",
     "rimraf": "^2.5.3",
