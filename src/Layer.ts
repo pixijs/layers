@@ -1,12 +1,6 @@
-/**
- * Created by ivanp on 29.01.2017.
- */
-
 import { Container } from '@pixi/display';
 import { Group } from './Group';
-import { RenderTexture, Renderer } from '@pixi/core';
-import { Rectangle } from '@pixi/math';
-import { settings } from '@pixi/settings';
+import { settings, Rectangle, RenderTexture, Renderer } from '@pixi/core';
 
 import type { DisplayObject, IDestroyOptions } from '@pixi/display';
 import type { Stage } from './Stage';
@@ -16,6 +10,7 @@ import type { ILayeredRenderer } from './RendererMixin';
  * This manages the render-texture a {@link Layer} renders into.
  *
  * This is used internally by {@link Layer#render}.
+ * @memberof PIXI.layers
  */
 export class LayerTextureCache
 {
@@ -196,6 +191,7 @@ export class LayerTextureCache
  *
  * All layers must be placed underneath a {@link Stage} - generally, you should assign a {@link Stage} as your
  * scene's root.
+ * @memberof PIXI.layers
  */
 export class Layer extends Container
 {
@@ -372,6 +368,7 @@ export class Layer extends Container
      * This is an **internal** method.
      *
      * @see Stage#updateStage
+     * @private
      */
     _onBeginLayerSubtreeTraversal(stage: Stage): void
     {
@@ -399,6 +396,7 @@ export class Layer extends Container
      * This is an **internal** method.
      *
      * @see Stage#updateStage
+     * @private
      */
     _onEndLayerSubtreeTraversal(): void
     {

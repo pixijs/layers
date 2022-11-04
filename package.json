@@ -1,16 +1,24 @@
 {
   "name": "@pixi/layers",
   "version": "1.0.11",
-  "description": "PixiJS v6 plugin, allows to change rendering order of containers without changing the scene graph.",
+  "description": "PixiJS plugin, allows to change rendering order of containers without changing the scene graph.",
   "author": "Ivan Popelyshev",
   "contributors": [
     "Ivan Popelyshev <ivan.popelyshev@gmail.com>"
   ],
-  "main": "./dist/pixi-layers.js",
-  "module": "./lib/pixi-layers.es.js",
-  "bundle": "./dist/pixi-layers.umd.js",
-  "namespace": "PIXI.display",
-  "types": "./index.d.ts",
+  "source": "./src/index.ts",
+  "main": "./lib/index.js",
+  "module": "./lib/index.mjs",
+  "types": "./lib/index.d.ts",
+  "bundle": "./dist/pixi-layers.js",
+  "exports": {
+    ".": {
+      "import": "./lib/index.mjs",
+      "require": "./lib/index.js",
+      "types": "./lib/index.d.ts"
+    }
+  },
+  "namespace": "PIXI.layers",
   "homepage": "http://www.pixijs.com/",
   "bugs": "https://github.com/pixijs/pixi-layers/issues",
   "license": "MIT",
@@ -19,33 +27,36 @@
     "url": "https://github.com/pixijs/pixi-layers.git"
   },
   "scripts": {
-    "clean": "rimraf dist/* lib/* compile",
+    "clean": "rimraf dist/* lib/*",
     "start": "run-s watch",
-    "watch": "rollup -cw scripts/rollup.config.js",
+    "watch": "rollup -cw",
+    "examples": "http-server . -o examples -s",
     "prebuild": "run-s clean lint types",
-    "build": "rollup -c scripts/rollup.config.js",
+    "build": "rollup -c",
     "postbuild": "run-s build:types",
-    "build:prod": "cross-env NODE_ENV=production run-s build",
-    "prebuild:types": "rimraf compile",
-    "build:types": "tsc --outDir compile --declaration && api-extractor run && node scripts/injectGlobalMixins",
+    "prebuild:types": "rimraf lib/**.d.ts",
+    "build:types": "tsc --outDir lib --declaration --emitDeclarationOnly",
+    "postbuild:types": "node ./scripts/fix-types",
     "lint": "eslint ./src",
     "types": "tsc -noEmit",
     "release:patch": "npm version patch && npm publish",
     "release:minor": "npm version minor && npm publish",
     "release:major": "npm version major && npm publish",
-    "postversion": "run-s build:prod",
-    "postpublish": "git push && git push --tags",
+    "postversion": "run-s build",
+    "postpublish": "run-s deploy && git push && git push --tags",
     "prepack": "clean-package",
     "postpack": "clean-package restore",
-    "docs": "typedoc --out ./docs/ --readme README.md ./src/",
-    "unit-test": "floss --path test --"
+    "predocs": "rimraf docs/**",
+    "docs": "webdoc -c webdoc.json -r README.md",
+    "predeploy": "run-s docs",
+    "deploy": "gh-pages -d . -s \"{dist,examples,docs}/**\" -f"
   },
   "publishConfig": {
     "access": "public"
   },
   "engines": {
-    "node": ">=14",
-    "npm": ">=7"
+    "node": ">=16",
+    "npm": ">=8"
   },
   "clean-package": {
     "indent": 2,
@@ -54,61 +65,44 @@
       "scripts",
       "engines",
       "devDependencies",
+      "eslintConfig",
+      "source",
       "eslintConfig"
     ]
   },
   "files": [
     "dist/",
     "lib/",
-    "index.d.ts",
-    "global.d.ts",
-    "LICENSE",
-    "package.json",
-    "README.md"
+    "global.d.ts"
   ],
+  "eslintConfig": {
+    "rules": {
+      "@typescript-eslint/triple-slash-reference": 0
+    },
+    "extends": [
+      "@pixi/eslint-config"
+    ]
+  },
   "peerDependencies": {
-    "@pixi/canvas-renderer": "^6.0.4",
-    "@pixi/constants": "^6.0.4",
-    "@pixi/core": "^6.0.4",
-    "@pixi/display": "^6.0.4",
-    "@pixi/math": "^6.0.4",
-    "@pixi/settings": "^6.0.4",
-    "@pixi/utils": "^6.0.4"
+    "@pixi/canvas-renderer": "^7.0.0",
+    "@pixi/core": "^7.0.0",
+    "@pixi/display": "^7.0.0"
   },
   "devDependencies": {
-    "@microsoft/api-extractor": "^7.17.1",
-    "@pixi-build-tools/rollup-configurator": "~1.0.11",
-    "@pixi/canvas-renderer": "^6.0.4",
-    "@pixi/constants": "^6.0.4",
-    "@pixi/core": "^6.0.4",
-    "@pixi/display": "^6.0.4",
-    "@pixi/eslint-config": "^2.0.1",
-    "@pixi/extract": "^6.0.4",
-    "@pixi/math": "^6.0.4",
-    "@pixi/settings": "^6.0.4",
-    "@pixi/utils": "^6.0.4",
-    "@rollup/plugin-node-resolve": "^8.4.0",
-    "@types/eventemitter3": "^2.0.2",
-    "@typescript-eslint/eslint-plugin": "^4.16.1",
-    "@typescript-eslint/parser": "^4.16.1",
+    "@pixi/canvas-renderer": "^7.0.0",
+    "@pixi/core": "^7.0.0",
+    "@pixi/display": "^7.0.0",
+    "@pixi/eslint-config": "^4.0.1",
+    "@pixi/webdoc-template": "^1.5.4",
+    "@webdoc/cli": "^2.2.0",
     "clean-package": "^1.0.1",
-    "chai": "^4.3.3",
-    "cross-env": "^7.0.3",
-    "del": "^2.2.0",
-    "electron": "^13.6.6",
     "eslint": "^7.21.0",
+    "gh-pages": "^4.0.0",
+    "http-server": "^14.1.1",
     "npm-run-all": "^4.1.5",
-    "floss": "^3.0.0",
-    "jsdoc": "^3.4.0",
-    "mkdirp": "^0.5.1",
-    "prepend": "=1.0.2",
-    "relative-deps": "^1.0.6",
     "rimraf": "^2.5.3",
     "rollup": "^2.50.5",
-    "rollup-plugin-sourcemaps": "^0.6.2",
-    "rollup-plugin-terser": "^7.0.0",
-    "@rollup/plugin-typescript": "^8.2.1",
-    "tslib": "^2.2.0",
+    "rollup-plugin-esbuild": "^4.10.1",
     "typescript": "^4.3.2"
   }
 }

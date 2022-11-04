@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Bring To Top | PixiJS Lights Examples</title>
+    <script src="https://pixijs.download/dev/pixi.min.js"></script>
+    <script src="../dist/pixi-layers.js"></script>
+    <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <h1>Bring To Top</h1>
+    <script>
+        const app = new PIXI.Application({ backgroundColor: 0x1099bb });
+        document.body.appendChild(app.view);
+
+        const textureGreen = PIXI.Texture.from('assets/bunny_green.png');
+        const textureBlue = PIXI.Texture.from('assets/bunny_blue.png');
+
+        const blue = new PIXI.Container();
+        const green = new PIXI.Container();
+
+        app.stage = new PIXI.layers.Stage();
+
+        const topLayer = new PIXI.layers.Layer();
+        app.stage.addChild(blue, green, topLayer);
+
+        for (let i = 0; i < 15; i++) {
+            const bunny = new PIXI.Sprite(textureGreen);
+            bunny.width = 50;
+            bunny.height = 50;
+            bunny.position.set(100 + 20 * i, 100 + 20 * i);
+            bunny.anchor.set(0.5);
+            green.addChild(bunny);
+        }
+
+        for (let i = 9; i >= 0; i--) {
+            const bunny = new PIXI.Sprite(textureBlue);
+            bunny.width = 50;
+            bunny.height = 50;
+            bunny.position.set(100 + 20 * i, 150 + 20 * i);
+            bunny.anchor.set(0.5);
+
+            if (i === 9) {
+                bunny.tint = 0xFF0000;
+                bunny.parentLayer = topLayer;
+            }
+            blue.addChild(bunny);
+        }
+
+    </script>
+  </html>

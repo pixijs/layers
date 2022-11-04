@@ -1,12 +1,12 @@
 # @pixi/layers - PixiJS Layers Kit
 
-[![Build](https://github.com/pixijs/layers/workflows/Build/badge.svg)](https://github.com/pixijs/layers/actions?query=workflow%3A%22Build%22) [![npm version](https://badge.fury.io/js/%40pixi%2Flayers.svg)](https://badge.fury.io/js/%40pixi%2Flayers)
+[![Build CI](https://github.com/pixijs/layers/actions/workflows/build.yml/badge.svg)](https://github.com/pixijs/layers/actions/workflows/build.yml) [![npm version](https://badge.fury.io/js/%40pixi%2Flayers.svg)](https://badge.fury.io/js/%40pixi%2Flayers)
 
 This package provides an extension to scene tree - layers. These layers allows you to change
 the rendering order of items in your scene without moving them around in your scene. It's like
 {@link PIXI.DisplayObject#zIndex zIndex}, but supercharged.
 
-It has been ported to PixiJS 6 since @pixi/layers 1.0.0 (formerly pixi-layers).
+It has been ported to PixiJS 7 since @pixi/layers 2.0.0 (formerly pixi-layers).
 
 **Nothing will work if you dont create Stage and set it as root. Please do it or read full explanation.**
 
@@ -16,28 +16,21 @@ It has been ported to PixiJS 6 since @pixi/layers 1.0.0 (formerly pixi-layers).
 npm install --save @pixi/layers
 ```
 
-### Migration from v5
-
-See [usage with canvas and particles](#usage-with-canvas-and-particles) part of this doc.
-
-If you still work with PixiJS `v5` and prior - see README `pixi-v5` branch, or just use npm package `pixi-layers`
-
 ## Examples
 
-* [Lighting example](https://pixijs.io/examples/#/plugin-layers/lighting.js)
-* [Z-order example](https://pixijs.io/examples/#/plugin-layers/zorder.js)
-* [Double buffering](http://pixijs.github.io/examples/#/layers/trail.js)
-* [Normals example - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
-* [Normals with sorting - WORK IN PROGRESS](http://pixijs.github.io/examples/#/layers/normals.js)
+* [Blend Modes example](https://pixijs.io/layers/examples/blend-modes.html)
+* [Z-order example](https://pixijs.io/layers/examples/z-order.html)
+* [Double buffering](https://pixijs.io/layers/examples/trail.html)
+* [Bring To Top](https://pixijs.io/layers/examples/bring-to-top.html)
 
 ## Usage
 
 {@link Layer} extends {@link PIXI.Container}:
 
 ```js
-import { Layer } from '@pixi/layers'
+import { Layer } from '@pixi/layers';
 
-let layer = new Layer();
+const layer = new Layer();
 ```
 
 A DisplayObject/Container can be rendered inside its layer instead of direct parent
@@ -89,29 +82,29 @@ When you move a character with attached sprites from different layers to a new s
 
 Instead, you can create a new display Group:
 
-```
-let lightGroup = new Group();
+```js
+const lightGroup = new Group();
 
 bunnySprite.parentGroup = lightGroup;
-let lightLayer = new Layer(lightGroup); // only one layer per stage can be bound to same group
+const lightLayer = new Layer(lightGroup); // only one layer per stage can be bound to same group
 ```
 
 Groups are working between different stages, so when you move bunny it will be rendered in its light layer.
 
 Layer is representation of global Group in this particular stage.
 
-## Vanilla JS, UMD build
+## Vanilla JS,
 
-All pixiJS v6 plugins has special `umd` build suited for vanilla.   
-Navigate `pixi-layers` npm package, take `dist/pixi-layers.umd.js` file.
+All PixiJS has a special bundle suited for vanilla JavaScript in the browser.   
+Navigate `pixi-layers` npm package, take `dist/pixi-layers.js` file.
 
 ```html
-<script src='lib/pixi.js'></script>
-<script src='lib/pixi-layers.umd.js'></script>
+<script src="./pixi.min.js"></script>
+<script src="./pixi-layers.js"></script>
 ```
 
 ```js
-let layer = new PIXI.display.Layer();
+const layer = new PIXI.layers.Layer();
 ```
 
 ## Usage with canvas and particles
@@ -123,19 +116,19 @@ The important thing is to call it when you know that corresponding module is loa
 If you use `@pixi/canvas-renderer`
 
 ```js
-import * as PIXI from 'pixi.js-legacy';
+import { CanvasRenderer } from 'pixi.js-legacy';
 import { applyCanvasMixin } from '@pixi/layers';
 
-applyCanvasMixin(PIXI.CanvasRenderer);
+applyCanvasMixin(CanvasRenderer);
 ```
 
 If you use `@pixi/particles`
 
 ```js
-import * as PIXI from 'pixi.js';
+import { ParticleContainer } from 'pixi.js';
 import { applyCanvasMixin } from '@pixi/layers';
 
-applyParticleMixin(PIXI.ParticleContainer);
+applyParticleMixin(ParticleContainer);
 ```
 
 ## Advanced sorting

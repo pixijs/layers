@@ -1,4 +1,4 @@
-import * as utils from '@pixi/utils';
+import { utils } from '@pixi/core';
 
 import type { DisplayObject } from '@pixi/display';
 import type { Layer } from './Layer';
@@ -6,6 +6,7 @@ import type { Stage } from './Stage';
 
 /**
  * A context for z-ordering {@link PIXI.DisplayObject}s within the same {@link Layer}.
+ * @memberof PIXI.layers
  */
 export class Group extends utils.EventEmitter
 {
@@ -107,6 +108,7 @@ export class Group extends utils.EventEmitter
      * This is an **internal** method.
      *
      * @see Stage#updateStage
+     * @private
      */
     _resolveChildDisplayObject(stage: Stage, displayObject: DisplayObject): void
     {
@@ -129,6 +131,7 @@ export class Group extends utils.EventEmitter
      * This is an **internal** method.
      *
      * @see Layer#_onBeginLayerSubtreeTraversal
+     * @private
      */
     _resolveLayer(stage: Stage, layer: Layer): void
     {
