@@ -1,6 +1,6 @@
 import { IRenderableObject, IRendererRenderOptions, Renderer } from '@pixi/core';
 import { Container } from '@pixi/display';
-import { LayersTreeSearch } from './LayersTreeSearch';
+// import { LayersTreeSearch } from './LayersTreeSearch';
 import { generateLayerContainerRenderMethod } from './DisplayMixin';
 
 import type { Stage } from './Stage';
@@ -44,10 +44,10 @@ function generateLayerRendererMethod(_oldRender: any)
         {
             (displayObject as Stage).updateStage();
         }
-        if (this.plugins.interaction && !this.plugins.interaction.search.worksWithLayers)
-        {
-            this.plugins.interaction.search = new LayersTreeSearch();
-        }
+        // if (this.plugins.interaction && !this.plugins.interaction.search.worksWithLayers)
+        // {
+        //     this.plugins.interaction.search = new LayersTreeSearch();
+        // }
 
         _oldRender.call(this, displayObject, options, arg1, arg2, arg3);
     };
