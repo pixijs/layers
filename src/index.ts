@@ -1,4 +1,5 @@
 /* eslint-disable spaced-comment */
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
 /// <reference path="../global.d.ts" />
 
 import { applyDisplayMixin, applyContainerRenderMixin, applyParticleMixin } from './DisplayMixin';
