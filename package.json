@@ -44,6 +44,7 @@
     "prepack": "clean-package",
     "postpack": "clean-package restore",
     "docs": "xs docs",
+    "test": "xs build,docs",
     "deploy": "xs deploy"
   },
   "publishConfig": {
