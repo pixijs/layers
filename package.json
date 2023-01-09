@@ -41,8 +41,6 @@
     "lint:fix": "xs lint --fix",
     "types": "xs types",
     "release": "xs release",
-    "prepack": "clean-package",
-    "postpack": "clean-package restore",
     "docs": "xs docs",
     "test": "xs build,docs",
     "deploy": "xs deploy"
@@ -53,16 +51,6 @@
   "engines": {
     "node": ">=16",
     "npm": ">=8"
-  },
-  "clean-package": {
-    "indent": 2,
-    "remove": [
-      "clean-package",
-      "scripts",
-      "engines",
-      "devDependencies",
-      "extensionConfig"
-    ]
   },
   "files": [
     "dist/",
@@ -78,7 +66,6 @@
     "@pixi/canvas-renderer": "^7.0.0",
     "@pixi/core": "^7.0.0",
     "@pixi/display": "^7.0.0",
-    "@pixi/extension-scripts": "^1.2.2",
-    "clean-package": "^1.0.1"
+    "@pixi/extension-scripts": "^1.3.0"
   }
 }
