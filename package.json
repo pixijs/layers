@@ -6,11 +6,9 @@
   "contributors": [
     "Ivan Popelyshev <ivan.popelyshev@gmail.com>"
   ],
-  "source": "./src/index.ts",
   "main": "./lib/index.js",
   "module": "./lib/index.mjs",
   "types": "./lib/index.d.ts",
-  "bundle": "./dist/pixi-layers.js",
   "exports": {
     ".": {
       "import": "./lib/index.mjs",
@@ -18,7 +16,15 @@
       "types": "./lib/index.d.ts"
     }
   },
-  "namespace": "PIXI.layers",
+  "extensionConfig": {
+    "lint": ["src"],
+    "namespace": "PIXI.layers",
+    "docsName": "PixiJS Layers",
+    "docsCopyright": "Copyright &copy; 2015 - 2022 Ivan Popelyshev",
+    "docsTitle": "PixiJS Layers API Documentation",
+    "docsDescription": "Documentation for PixiJS Layers library",
+    "docsKeyword": "docs, documentation, pixi, pixijs, rendering, pixi-layers, display, pixi-display, javascript, jsdoc"
+  },
   "homepage": "http://www.pixijs.com/",
   "bugs": "https://github.com/pixijs/pixi-layers/issues",
   "license": "MIT",
@@ -27,29 +33,17 @@
     "url": "https://github.com/pixijs/pixi-layers.git"
   },
   "scripts": {
-    "clean": "rimraf dist/* lib/*",
-    "start": "run-s watch",
-    "watch": "rollup -cw",
-    "examples": "http-server . -o examples -s",
-    "prebuild": "run-s clean lint types",
-    "build": "rollup -c",
-    "postbuild": "run-s build:types",
-    "prebuild:types": "rimraf lib/**.d.ts",
-    "build:types": "tsc --outDir lib --declaration --emitDeclarationOnly",
-    "postbuild:types": "node ./scripts/fix-types",
-    "lint": "eslint ./src",
-    "types": "tsc -noEmit",
-    "release:patch": "npm version patch && npm publish",
-    "release:minor": "npm version minor && npm publish",
-    "release:major": "npm version major && npm publish",
-    "postversion": "run-s build",
-    "postpublish": "run-s deploy && git push && git push --tags",
-    "prepack": "clean-package",
-    "postpack": "clean-package restore",
-    "predocs": "rimraf docs/**",
-    "docs": "webdoc -c webdoc.json -r README.md",
-    "predeploy": "run-s docs",
-    "deploy": "gh-pages -d . -s \"{dist,examples,docs}/**\" -f"
+    "clean": "xs clean",
+    "start": "xs serve",
+    "watch": "xs watch",
+    "build": "xs build",
+    "lint": "xs lint",
+    "lint:fix": "xs lint --fix",
+    "types": "xs types",
+    "release": "xs release",
+    "docs": "xs docs",
+    "test": "xs build,docs",
+    "deploy": "xs deploy"
   },
   "publishConfig": {
     "access": "public"
@@ -58,31 +52,11 @@
     "node": ">=16",
     "npm": ">=8"
   },
-  "clean-package": {
-    "indent": 2,
-    "remove": [
-      "clean-package",
-      "scripts",
-      "engines",
-      "devDependencies",
-      "eslintConfig",
-      "source",
-      "eslintConfig"
-    ]
-  },
   "files": [
     "dist/",
     "lib/",
     "global.d.ts"
   ],
-  "eslintConfig": {
-    "rules": {
-      "@typescript-eslint/triple-slash-reference": 0
-    },
-    "extends": [
-      "@pixi/eslint-config"
-    ]
-  },
   "peerDependencies": {
     "@pixi/canvas-renderer": "^7.0.0",
     "@pixi/core": "^7.0.0",
@@ -92,17 +66,6 @@
     "@pixi/canvas-renderer": "^7.0.0",
     "@pixi/core": "^7.0.0",
     "@pixi/display": "^7.0.0",
-    "@pixi/eslint-config": "^4.0.1",
-    "@pixi/webdoc-template": "^1.5.4",
-    "@webdoc/cli": "^2.2.0",
-    "clean-package": "^1.0.1",
-    "eslint": "^7.21.0",
-    "gh-pages": "^4.0.0",
-    "http-server": "^14.1.1",
-    "npm-run-all": "^4.1.5",
-    "rimraf": "^2.5.3",
-    "rollup": "^2.50.5",
-    "rollup-plugin-esbuild": "^4.10.1",
-    "typescript": "^4.3.2"
+    "@pixi/extension-scripts": "^1.4.0"
   }
 }

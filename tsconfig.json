@@ -1,14 +1,8 @@
 {
+    "extends": "@pixi/extension-scripts/lib/configs/tsconfig.json",
     "compilerOptions": {
-        "target": "ES2020",
-        "noImplicitAny": true,
-        "removeComments": true,
+        "strict": false,
         "preserveConstEnums": true,
-        "sourceMap": true,
-        "inlineSources": true,
-        "esModuleInterop": true,
-        "moduleResolution": "node",
-        "allowSyntheticDefaultImports": true,
         "baseUrl": "./",
         "paths": {
             "@pixi/layers": [
@@ -18,10 +12,5 @@
     },
     "include": [
         "src/**/*"
-    ],
-    "exclude": [
-        "node_modules/**/*",
-        "dist",
-        "lib"
     ]
 }
