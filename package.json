@@ -66,6 +66,6 @@
     "@pixi/canvas-renderer": "^7.0.0",
     "@pixi/core": "^7.0.0",
     "@pixi/display": "^7.0.0",
-    "@pixi/extension-scripts": "^1.4.0"
+    "@pixi/extension-scripts": "^1.8.1"
   }
 }
